@@ -1,5 +1,5 @@
 // VieNeu Mobile Player Service Worker
-const CACHE_NAME = 'vieneu-pwa-v1.2.1';
+const CACHE_NAME = 'vieneu-pwa-v1.2.2';
 const ASSETS = [
   './',
   './index.html',
