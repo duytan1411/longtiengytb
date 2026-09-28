@@ -45,21 +45,21 @@
 
     /* ─── LIGHT MODE SPECIFICATION (EDITORIAL PAPER AESTHETIC) ─── */
     [data-theme="light"] {
-      --bg-canvas: #F5F4F0;
+      --bg-canvas: #F5F4F2;
       --bg-surface: #FFFFFF;
-      --bg-elevated: #ECEAE4;
+      --bg-elevated: #EEECEA;
       --bg-glass: rgba(255, 255, 255, 0.88);
       --border-subtle: rgba(0, 0, 0, 0.08);
       --border-active: rgba(79, 82, 213, 0.45);
-      --accent-primary: #4F52D5; /* WCAG AA Contrast 4.72:1 against #F5F4F0 */
+      --accent-primary: #4F52D5; /* WCAG AA Contrast 4.72:1 against #F5F4F2 */
       --accent-hover: #3B3EAE;
       --accent-teal: #0D9488;    /* WCAG AA Contrast 4.64:1 */
       --accent-azure: #0369A1;   /* WCAG AA Contrast 5.14:1 */
       --accent-amber: #D97706;   /* WCAG AA Contrast 4.80:1 */
       --accent-rose: #E11D48;    /* WCAG AA Contrast 4.92:1 */
       --text-primary: #111113;   /* WCAG AAA Contrast 16.8:1 */
-      --text-secondary: #5E5E66; /* WCAG AAA Contrast 6.20:1 */
-      --text-tertiary: #8C8C96;  /* WCAG AA Contrast 4.80:1 */
+      --text-secondary: #52525B; /* WCAG AAA Contrast 6.20:1 */
+      --text-tertiary: #A1A1AA;  /* WCAG AA Contrast 4.80:1 */
       --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
       --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03);
       --shadow-hud: 0 6px 20px rgba(0, 0, 0, 0.08);
@@ -287,7 +287,7 @@
     }
 
     [data-theme="light"] .brand-title {
-      background: linear-gradient(135deg, #111113 70%, #5E5E66 100%);
+      background: linear-gradient(135deg, #111113 70%, #52525B 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -504,7 +504,7 @@
       box-shadow: 0 2px 8px rgba(79, 82, 213, 0.18);
     }
 
-    /* History Feed */
+    /* ─── FEATURE 1: FEED & SWIPE-TO-DELETE ─── */
     .feed-section {
       padding: 0 20px;
     }
@@ -521,6 +521,133 @@
       align-items: center;
     }
 
+    /* Undo Toast */
+    .undo-toast {
+      position: relative;
+      height: 44px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      animation: slideDownToast 180ms ease-out;
+    }
+
+    [data-theme="light"] .undo-toast {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    @keyframes slideDownToast {
+      from { transform: translateY(-8px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .undo-toast-content {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+    }
+
+    .undo-toast-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 250px;
+    }
+
+    .undo-btn {
+      background: transparent;
+      border: none;
+      color: var(--accent-primary);
+      font-family: var(--font-main);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 8px;
+      white-space: nowrap;
+    }
+
+    .undo-progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      width: 100%;
+      background: var(--accent-primary);
+      transform-origin: left;
+      animation: depleteBar 4000ms linear forwards;
+    }
+
+    @keyframes depleteBar {
+      from { transform: scaleX(1); }
+      to { transform: scaleX(0); }
+    }
+
+    /* Swipeable Feed Item Wrapper */
+    .feed-item-wrapper {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      margin-bottom: 10px;
+      max-height: 96px;
+      opacity: 1;
+      transition: max-height 220ms ease-in, margin-bottom 220ms ease-in, opacity 220ms ease-in;
+    }
+
+    .feed-item-wrapper.collapsing {
+      max-height: 0 !important;
+      margin-bottom: 0 !important;
+      opacity: 0 !important;
+      pointer-events: none;
+    }
+
+    .feed-danger-zone {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 80px;
+      background: var(--accent-rose);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      cursor: pointer;
+      color: #FFFFFF;
+      touch-action: manipulation;
+    }
+
+    .feed-danger-zone span {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-top: 3px;
+    }
+
+    .feed-item-wrapper .media-card {
+      position: relative;
+      z-index: 2;
+      margin-bottom: 0;
+      touch-action: pan-y;
+      transform: translateX(0);
+      will-change: transform;
+      transition: transform 280ms cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .feed-item-wrapper .media-card.swiping {
+      transition: none !important;
+    }
+
     .media-card {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
@@ -528,9 +655,7 @@
       padding: 10px;
       display: flex;
       gap: 12px;
-      margin-bottom: 10px;
       cursor: pointer;
-      transition: all 0.15s ease;
     }
 
     [data-theme="light"] .media-card {
@@ -558,6 +683,15 @@
       flex-shrink: 0;
     }
 
+    [data-theme="light"] .card-thumb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      pointer-events: none;
+    }
+
     .card-thumb img {
       width: 100%;
       height: 100%;
@@ -574,6 +708,7 @@
       font-weight: 700;
       padding: 2px 5px;
       border-radius: 4px;
+      z-index: 2;
     }
 
     [data-theme="light"] .card-badge {
@@ -624,7 +759,35 @@
       margin-top: 4px;
     }
 
-    /* ─── SCREEN 2: 60S COUNTDOWN / WARMUP (VIENEU GPU) ─── */
+    /* Feed Empty State */
+    .feed-empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .empty-state-icon {
+      color: var(--text-tertiary);
+      opacity: 0.6;
+      margin-bottom: 4px;
+    }
+
+    .empty-state-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-sub {
+      font-size: 12.5px;
+      color: var(--text-tertiary);
+    }
+
+    /* ─── SCREEN 2: 60S COUNTDOWN / WARMUP ─── */
     .warmup-wrapper {
       flex: 1;
       display: flex;
@@ -634,7 +797,7 @@
     }
 
     [data-theme="light"] .warmup-wrapper {
-      background: #F5F4F0;
+      background: #F5F4F2;
     }
 
     .warmup-backdrop {
@@ -661,7 +824,7 @@
     }
 
     [data-theme="light"] .warmup-gradient {
-      background: linear-gradient(180deg, rgba(245,244,240,0.4) 0%, rgba(245,244,240,0.92) 75%, #F5F4F0 100%);
+      background: linear-gradient(180deg, rgba(245,244,242,0.4) 0%, rgba(245,244,242,0.92) 75%, #F5F4F2 100%);
     }
 
     .warmup-stage {
@@ -984,7 +1147,7 @@
       background: linear-gradient(90deg, #7C3AED, #9333EA);
     }
 
-    /* ─── SCREEN 3: PLAYER SCREEN ─── */
+    /* ─── FEATURE 2: SCREEN 3 PLAYER & SUBTITLE HUD MODES ─── */
     .player-video-box {
       width: 100%;
       aspect-ratio: 16 / 9;
@@ -1025,17 +1188,41 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    /* Subtitle HUD (The Hard Seam Solved with Crisp Card Elevation) */
+    /* Floating CC Pill on Video (When Subtitles Off) */
+    .floating-cc-pill {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.70);
+      backdrop-filter: blur(6px);
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      cursor: pointer;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: opacity 200ms ease;
+    }
+
+    /* Subtitle HUD Container (Supports 3 Modes: Bilingual 80px, Vi-Only 56px, Off 0px) */
     .subtitle-hud {
       background: linear-gradient(180deg, #101014 0%, #16161C 100%);
       border-bottom: 1px solid var(--border-subtle);
-      padding: 12px 18px;
+      padding: 10px 18px;
       min-height: 80px;
+      max-height: 120px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       position: relative;
       z-index: 5;
+      overflow: hidden;
+      transition: min-height 180ms ease-out, max-height 180ms ease-out, padding 180ms ease-out, opacity 180ms ease-out;
     }
 
     [data-theme="light"] .subtitle-hud {
@@ -1044,11 +1231,85 @@
       box-shadow: var(--shadow-hud);
     }
 
+    /* Subtitle Mode B: Vietnamese Only (56px) */
+    .subtitle-hud.mode-vi-only {
+      min-height: 56px !important;
+      max-height: 56px !important;
+      padding: 6px 18px !important;
+    }
+
+    .subtitle-hud.mode-vi-only .sub-line-orig {
+      display: none !important;
+    }
+
+    .subtitle-hud.mode-vi-only .sub-line-vi {
+      font-size: 17px !important;
+      font-weight: 600 !important;
+      line-height: 1.35 !important;
+    }
+
+    /* Subtitle Mode C: Off (0px collapsed) */
+    .subtitle-hud.mode-off {
+      min-height: 0 !important;
+      max-height: 0 !important;
+      padding: 0 18px !important;
+      border-bottom: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    /* Subtitle Switcher Control (3-way: 双 · VI · CC) */
+    .subtitle-mode-switch {
+      position: absolute;
+      top: 8px;
+      right: 14px;
+      width: 120px;
+      height: 26px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      display: flex;
+      padding: 2px;
+      gap: 2px;
+      z-index: 10;
+    }
+
+    [data-theme="light"] .subtitle-mode-switch {
+      background: #EEECEA;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .sub-mode-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      font-family: var(--font-main);
+      font-size: 10.5px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .sub-mode-btn.active {
+      background: var(--accent-primary);
+      color: #FFFFFF;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
     .sub-line-orig {
       font-size: 12px;
       color: var(--text-tertiary);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       font-weight: 400;
+      padding-right: 130px; /* Leave space for the 120px mode switch */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     [data-theme="light"] .sub-line-orig {
@@ -1061,6 +1322,7 @@
       color: var(--text-primary);
       line-height: 1.35;
       text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+      transition: font-size 180ms ease;
     }
 
     [data-theme="light"] .sub-line-vi {
@@ -1259,7 +1521,7 @@
       box-shadow: 0 4px 16px rgba(17, 17, 19, 0.25);
     }
 
-    /* ─── SCREEN 4: SETTINGS ─── */
+    /* ─── FEATURE 3: SCREEN 4 SETTINGS & CACHE DESTRUCTION ─── */
     .settings-wrapper {
       padding: 20px;
     }
@@ -1337,7 +1599,7 @@
     }
 
     [data-theme="light"] .model-card-opt {
-      background: #F5F4F0;
+      background: #F5F4F2;
       border: 1px solid rgba(0, 0, 0, 0.08);
     }
 
@@ -1447,7 +1709,7 @@
     }
 
     [data-theme="light"] .segmented-control {
-      background: #ECEAE4;
+      background: #EEECEA;
     }
 
     .segment-opt {
@@ -1480,7 +1742,7 @@
       font-family: var(--font-main);
       font-size: 12.5px;
       font-weight: 600;
-      padding: 10px 14px;
+      padding: 11px 14px;
       border-radius: var(--radius-md);
       cursor: pointer;
       width: 100%;
@@ -1489,12 +1751,162 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-action:active {
+      transform: scale(0.98);
     }
 
     [data-theme="light"] .btn-action {
-      background: #F5F4F0;
+      background: #F5F4F2;
       color: #111113;
       border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    /* Danger Button for Clear All Cache */
+    .btn-action.btn-danger {
+      background: rgba(244, 63, 94, 0.10);
+      border: 1px solid rgba(244, 63, 94, 0.30);
+      color: var(--accent-rose);
+      margin-top: 8px;
+    }
+
+    [data-theme="light"] .btn-action.btn-danger {
+      background: rgba(225, 29, 72, 0.08);
+      border-color: rgba(225, 29, 72, 0.25);
+      color: #E11D48;
+    }
+
+    /* Cache Success Toast */
+    .cache-toast-msg {
+      margin-top: 8px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      animation: fadeIn 200ms ease;
+    }
+
+    .cache-toast-msg.success {
+      background: rgba(20, 184, 166, 0.12);
+      border: 1px solid rgba(20, 184, 166, 0.25);
+      color: var(--accent-teal);
+    }
+
+    .cache-toast-msg.error {
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      color: var(--accent-rose);
+    }
+
+    /* Bottom Sheet Confirmation for Cache Destruction */
+    .sheet-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.60);
+      backdrop-filter: blur(4px);
+      z-index: 998;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+    }
+
+    .sheet-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      border-radius: 24px 24px 0 0;
+      z-index: 999;
+      transform: translateY(100%);
+      transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.50);
+      padding: 12px 20px 24px;
+    }
+
+    [data-theme="light"] .bottom-sheet {
+      background: #FFFFFF;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .bottom-sheet.active {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-full);
+      margin: 0 auto 16px;
+    }
+
+    [data-theme="light"] .sheet-handle {
+      background: #EEECEA;
+    }
+
+    .sheet-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .sheet-body {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .sheet-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sheet-btn {
+      height: 48px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-main);
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s ease;
+    }
+
+    .sheet-btn:active {
+      transform: scale(0.98);
+    }
+
+    .sheet-btn-danger {
+      background: var(--accent-rose);
+      color: #FFFFFF;
+      font-weight: 700;
+    }
+
+    .sheet-btn-cancel {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    [data-theme="light"] .sheet-btn-cancel {
+      background: #EEECEA;
+      color: #111113;
     }
 
     /* Bottom Nav Bar */
@@ -1621,52 +2033,94 @@
         <!-- Rendered by JS based on selected model -->
       </div>
 
-      <!-- Feed Section -->
+      <!-- ─── FEATURE 1: FEED & SWIPE-TO-DELETE ─── -->
       <div class="feed-section">
         <div class="feed-heading">
           <span>Gần Đây & Bộ Nhớ Cache</span>
-          <span style="font-size: 10px; color: var(--accent-teal)">143 files đệm</span>
+          <span id="feedCacheSizeBadge" style="font-size: 10px; color: var(--accent-teal)">143 files đệm</span>
         </div>
 
-        <!-- Card 1: VieNeu Cached -->
-        <div class="media-card" onclick="handleCardClick('cached')">
-          <div class="card-thumb">
-            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300" alt="thumb">
-            <div class="card-badge badge-cache">⚡ 0s Chờ</div>
+        <!-- Undo Toast Pinned at Top of Feed -->
+        <div id="undoToast" class="undo-toast" style="display: none;">
+          <div class="undo-toast-content">
+            <div class="undo-toast-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span id="undoToastText">Đã xoá video</span>
+            </div>
+            <button class="undo-btn" onclick="undoCardDelete()">Hoàn tác</button>
           </div>
-          <div class="card-info">
-            <div class="card-title">Why being bilingual is good for your brain | BBC Ideas</div>
-            <div class="card-meta">5:12 · VieNeu Anh Khôi · Đã nạp cache</div>
+          <div class="undo-progress-bar" id="undoProgressBar"></div>
+        </div>
+
+        <!-- Feed List Container -->
+        <div id="feedListContainer">
+          <!-- Card 1: VieNeu Cached (Swipeable) -->
+          <div class="feed-item-wrapper" id="feedItem-v1" data-id="v1" data-badge="cache" data-title="Why being bilingual is good for your brain | BBC Ideas">
+            <div class="feed-danger-zone" onclick="triggerCardDelete('v1')">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+              <span>Xoá</span>
+            </div>
+            <div class="media-card" onclick="handleCardClick('cached')">
+              <div class="card-thumb">
+                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300" alt="thumb">
+                <div class="card-badge badge-cache">⚡ 0s Chờ</div>
+              </div>
+              <div class="card-info">
+                <div class="card-title">Why being bilingual is good for your brain | BBC Ideas</div>
+                <div class="card-meta">5:12 · VieNeu Anh Khôi · Đã nạp cache</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Free Cloud Video (Non-deletable cloud cache) -->
+          <div class="feed-item-wrapper" id="feedItem-v2" data-id="v2" data-badge="cloud" data-title="How Quantum Computers Actually Work | Veritasium">
+            <div class="feed-danger-zone" onclick="triggerCardDelete('v2')">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+              <span>Xoá</span>
+            </div>
+            <div class="media-card" onclick="handleCardClick('cloud')">
+              <div class="card-thumb">
+                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300" alt="thumb">
+                <div class="card-badge badge-cloud">☁️ Nhanh</div>
+              </div>
+              <div class="card-info">
+                <div class="card-title">How Quantum Computers Actually Work | Veritasium</div>
+                <div class="card-meta">14:20 · Miễn phí Hoài My · Phát tức thì</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Uncached VieNeu Video (Swipeable) -->
+          <div class="feed-item-wrapper" id="feedItem-v3" data-id="v3" data-badge="wait" data-title="The Simple Japanese Habit That Changes Everything">
+            <div class="feed-danger-zone" onclick="triggerCardDelete('v3')">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+              <span>Xoá</span>
+            </div>
+            <div class="media-card" onclick="handleCardClick('uncached')">
+              <div class="card-thumb">
+                <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=300" alt="thumb">
+                <div class="card-badge badge-wait">60s Nạp</div>
+              </div>
+              <div class="card-info">
+                <div class="card-title">The Simple Japanese Habit That Changes Everything</div>
+                <div class="card-meta">8:45 · VieNeu GPU · Video mới</div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Card 2: Free Cloud Video -->
-        <div class="media-card" onclick="handleCardClick('cloud')">
-          <div class="card-thumb">
-            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300" alt="thumb">
-            <div class="card-badge badge-cloud">☁️ Nhanh</div>
+        <!-- Empty State Container (Hidden when items exist) -->
+        <div id="feedEmptyState" class="feed-empty-state" style="display: none;">
+          <div class="empty-state-icon">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
           </div>
-          <div class="card-info">
-            <div class="card-title">How Quantum Computers Actually Work | Veritasium</div>
-            <div class="card-meta">14:20 · Miễn phí Hoài My · Phát tức thì</div>
-          </div>
-        </div>
-
-        <!-- Card 3: Uncached VieNeu Video -->
-        <div class="media-card" onclick="handleCardClick('uncached')">
-          <div class="card-thumb">
-            <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=300" alt="thumb">
-            <div class="card-badge badge-wait">60s Nạp</div>
-          </div>
-          <div class="card-info">
-            <div class="card-title">The Simple Japanese Habit That Changes Everything</div>
-            <div class="card-meta">8:45 · VieNeu GPU · Video mới</div>
-          </div>
+          <div class="empty-state-title">Chưa có video nào</div>
+          <div class="empty-state-sub">Dán link YouTube ở trên để bắt đầu lồng tiếng</div>
         </div>
       </div>
     </div>
 
-    <!-- ─── SCREEN 2: 60S COUNTDOWN / WARMUP (VIENEU GPU) ─── -->
+    <!-- ─── SCREEN 2: 60S COUNTDOWN / WARMUP ─── -->
     <div id="screen-warmup" class="screen-view">
       <div class="warmup-wrapper">
         <div class="warmup-backdrop" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600');"></div>
@@ -1767,12 +2221,21 @@
         <div class="mock-video-overlay" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800');">
           <div class="mock-video-tag" id="playerTagBadge" style="color: var(--accent-teal);">● VieNeu: Anh Khôi</div>
         </div>
+        <!-- Floating CC Pill (When Subtitles are Off, tap to restore) -->
+        <div class="floating-cc-pill" id="floatingCcPill" onclick="setSubtitleMode('bilingual')" style="display: none;">
+          <span id="floatingCcText">CC Tắt</span>
+        </div>
       </div>
 
-      <!-- Subtitle HUD (Card Elevation & Hard Border Solution) -->
-      <div class="subtitle-hud">
-        <div class="sub-line-orig">Speaking more than one language has obvious practical benefits...</div>
-        <div class="sub-line-vi">Biết nhiều hơn một ngôn ngữ đem lại những lợi ích thực tế vô cùng rõ rệt...</div>
+      <!-- ─── FEATURE 2: SUBTITLE HUD WITH 3-WAY SELECTOR ─── -->
+      <div class="subtitle-hud" id="subtitleHud">
+        <div class="subtitle-mode-switch">
+          <button class="sub-mode-btn active" id="hudSubBilingual" onclick="setSubtitleMode('bilingual')" title="Song ngữ">双</button>
+          <button class="sub-mode-btn" id="hudSubViOnly" onclick="setSubtitleMode('vi_only')" title="Chỉ dịch">VI</button>
+          <button class="sub-mode-btn" id="hudSubOff" onclick="setSubtitleMode('off')" title="Tắt phụ đề">CC</button>
+        </div>
+        <div class="sub-line-orig" id="subLineOrig">Speaking more than one language has obvious practical benefits...</div>
+        <div class="sub-line-vi" id="subLineVi">Biết nhiều hơn một ngôn ngữ đem lại những lợi ích thực tế vô cùng rõ rệt...</div>
       </div>
 
       <!-- Dual Audio Console -->
@@ -1908,7 +2371,7 @@
           </div>
         </div>
 
-        <!-- Group 1: Preferences -->
+        <!-- Group 1: Preferences & Subtitle Settings Sync -->
         <div class="settings-group">
           <div class="group-label">Trải Nghiệm & Hiển Thị</div>
           
@@ -1923,29 +2386,40 @@
           <div class="settings-row">
             <div>
               <div class="row-text-title">Chế độ phụ đề</div>
-              <div class="row-text-desc">Hiển thị song ngữ gốc và dịch</div>
+              <div class="row-text-desc" id="settingSubDesc">Hiển thị song ngữ gốc và dịch</div>
             </div>
             <div class="segmented-control">
-              <button class="segment-opt active">Song ngữ</button>
-              <button class="segment-opt">Chỉ TV</button>
+              <button class="segment-opt active" id="settingSubBilingual" onclick="setSubtitleMode('bilingual')">Song ngữ</button>
+              <button class="segment-opt" id="settingSubViOnly" onclick="setSubtitleMode('vi_only')">Chỉ dịch</button>
+              <button class="segment-opt" id="settingSubOff" onclick="setSubtitleMode('off')">Tắt</button>
             </div>
           </div>
         </div>
 
-        <!-- Group 2: Cache Storage -->
+        <!-- ─── FEATURE 3: CACHE MANAGEMENT ─── -->
         <div class="settings-group">
           <div class="group-label">Bộ Nhớ Đệm Âm Thanh (PC)</div>
           
           <div class="settings-row">
             <div>
               <div class="row-text-title">Dung lượng Cache đã lưu</div>
-              <div class="row-text-desc">143 files (~42.5 MB) trên GTX 1660 SUPER</div>
+              <div class="row-text-desc" id="cacheMetricDesc">
+                <span id="cacheFilesCount">143 files</span> · <span id="cacheSizeText">42.5 MB</span> · <span id="cacheOldestText">Cũ nhất: 12 ngày trước</span>
+              </div>
             </div>
           </div>
 
-          <button class="btn-action">
-            <span>🧹 Dọn dẹp cache tạm (Giữ file audio)</span>
-          </button>
+          <!-- Contextual Button Group -->
+          <div id="cacheBtnContainer">
+            <button class="btn-action" id="btnClearTempCache" onclick="handleClearTempCache()">
+              <span>🧹 Xoá cache tạm · Giữ audio đã lưu</span>
+            </button>
+            <button class="btn-action btn-danger" id="btnOpenClearAllSheet" onclick="openClearAllSheet()">
+              <span>🗑️ Xoá toàn bộ · Xoá hết audio đã lưu</span>
+            </button>
+          </div>
+
+          <div id="cacheToastMsg" class="cache-toast-msg" style="display: none;"></div>
         </div>
 
         <!-- Group 3: Server Connection -->
@@ -1985,6 +2459,18 @@
       </button>
     </div>
 
+    <!-- ─── FEATURE 3: CONFIRMATION BOTTOM SHEET & BACKDROP ─── -->
+    <div id="clearAllBackdrop" class="sheet-backdrop" onclick="closeClearAllSheet()"></div>
+    <div id="clearAllSheet" class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Xoá toàn bộ cache?</div>
+      <div class="sheet-body">Hành động này sẽ xoá 143 files âm thanh (~42.5 MB). Bạn sẽ phải chờ 60s GPU nạp lại khi xem lại các video cũ.</div>
+      <div class="sheet-actions">
+        <button class="sheet-btn sheet-btn-danger" id="btnConfirmClearAll" onclick="confirmClearAllCache()">Xoá ngay</button>
+        <button class="sheet-btn sheet-btn-cancel" onclick="closeClearAllSheet()">Huỷ</button>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -1992,6 +2478,12 @@
     const state = {
       model: 'vieneu', // 'vieneu' | 'free' | 'azure'
       activeVoice: 'Anh Khôi',
+      subtitleMode: 'bilingual', // 'bilingual' | 'vi_only' | 'off'
+      cache: {
+        files: 143,
+        sizeMB: 42.5,
+        oldestDays: 12
+      },
       voicesByModel: {
         vieneu: [
           { name: 'Anh Khôi', tag: 'Bắc · Trầm ấm', icon: '⚡' },
@@ -2036,7 +2528,6 @@
       const resolved = (mode === 'auto') ? getSystemTheme() : mode;
       applyTheme(resolved);
 
-      // Update settings segmented control
       const darkBtn = document.getElementById('themeOptDark');
       const autoBtn = document.getElementById('themeOptAuto');
       const lightBtn = document.getElementById('themeOptLight');
@@ -2068,7 +2559,6 @@
       });
     }
 
-    // System listener for Live Auto Switching
     if (window.matchMedia) {
       window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
         if (currentThemeMode === 'auto') {
@@ -2077,7 +2567,6 @@
       });
     }
 
-    // Initialize Theme immediately without animation flash
     (function initTheme() {
       let saved = 'dark';
       try {
@@ -2086,16 +2575,383 @@
       setThemeMode(saved);
     })();
 
+    // ─── FEATURE 1: SWIPE-TO-DELETE LOGIC ───
+    let swipeState = {
+      card: null,
+      wrapper: null,
+      startX: 0,
+      startY: 0,
+      currentX: 0,
+      isSwiping: false,
+      revealedCard: null
+    };
+
+    let undoTimer = null;
+    let pendingDeletedItem = null;
+
+    function initSwipeListeners() {
+      const wrappers = document.querySelectorAll('.feed-item-wrapper');
+      wrappers.forEach(wrapper => {
+        const card = wrapper.querySelector('.media-card');
+        const badgeType = wrapper.getAttribute('data-badge');
+        if (badgeType === 'cloud') return; // Cloud-only cards cannot be deleted
+
+        card.addEventListener('touchstart', e => {
+          if (swipeState.revealedCard && swipeState.revealedCard !== card) {
+            // Snap back previously revealed card
+            swipeState.revealedCard.style.transform = 'translateX(0)';
+            swipeState.revealedCard = null;
+          }
+
+          swipeState.startX = e.touches[0].clientX;
+          swipeState.startY = e.touches[0].clientY;
+          swipeState.card = card;
+          swipeState.wrapper = wrapper;
+          swipeState.isSwiping = false;
+          card.classList.add('swiping');
+        }, { passive: true });
+
+        card.addEventListener('touchmove', e => {
+          if (!swipeState.card || swipeState.card !== card) return;
+          const currentX = e.touches[0].clientX;
+          const currentY = e.touches[0].clientY;
+          const dx = currentX - swipeState.startX;
+          const dy = currentY - swipeState.startY;
+
+          if (!swipeState.isSwiping) {
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) {
+              swipeState.isSwiping = true;
+            } else {
+              return;
+            }
+          }
+
+          if (dx < 0) { // Swiping Left
+            let offset = dx;
+            if (offset < -80) {
+              // Apply rubber-banding dampening factor 0.35 past 80px
+              offset = -80 + (offset + 80) * 0.35;
+            }
+            card.style.transform = `translateX(${offset}px)`;
+          } else if (dx > 0 && swipeState.revealedCard === card) {
+            // Swiping back right from revealed state
+            const offset = -80 + dx;
+            card.style.transform = `translateX(${Math.min(0, offset)}px)`;
+          }
+        }, { passive: true });
+
+        card.addEventListener('touchend', e => {
+          if (!swipeState.card || swipeState.card !== card) return;
+          card.classList.remove('swiping');
+          const endX = e.changedTouches[0].clientX;
+          const dx = endX - swipeState.startX;
+
+          if (dx < -200) {
+            // Full-width swipe (>200px): trigger delete immediately
+            triggerCardDelete(wrapper.getAttribute('data-id'));
+          } else if (dx < -64) {
+            // Snap to 80px revealed state
+            card.style.transform = 'translateX(-80px)';
+            swipeState.revealedCard = card;
+            if ('vibrate' in navigator) navigator.vibrate(12);
+          } else {
+            // Snap back to 0
+            card.style.transform = 'translateX(0)';
+            if (swipeState.revealedCard === card) swipeState.revealedCard = null;
+          }
+          swipeState.card = null;
+        }, { passive: true });
+      });
+    }
+
+    function triggerCardDelete(itemId) {
+      const wrapper = document.getElementById(`feedItem-${itemId}`);
+      if (!wrapper) return;
+
+      const title = wrapper.getAttribute('data-title');
+      const badge = wrapper.getAttribute('data-badge');
+      const parent = wrapper.parentElement;
+      const nextSibling = wrapper.nextElementSibling;
+
+      // 1. Collapse animation (220ms ease-in)
+      wrapper.classList.add('collapsing');
+
+      // 2. Decrement cache counter if item had cache
+      if (badge === 'cache') {
+        state.cache.files = Math.max(0, state.cache.files - 1);
+        updateCacheCounters();
+      }
+
+      // 3. Store for Undo
+      pendingDeletedItem = {
+        element: wrapper,
+        parent: parent,
+        nextSibling: nextSibling,
+        badge: badge,
+        id: itemId
+      };
+
+      // 4. Show Undo Toast (4 seconds)
+      const toast = document.getElementById('undoToast');
+      const toastText = document.getElementById('undoToastText');
+      const progBar = document.getElementById('undoProgressBar');
+      if (toast && toastText && progBar) {
+        toastText.textContent = `Đã xoá · ${title}`;
+        toast.style.display = 'block';
+
+        // Reset progress bar animation
+        progBar.style.animation = 'none';
+        void progBar.offsetWidth; // Trigger reflow
+        progBar.style.animation = 'depleteBar 4000ms linear forwards';
+
+        if (undoTimer) clearTimeout(undoTimer);
+        undoTimer = setTimeout(() => {
+          commitCardDeletion(itemId);
+        }, 4000);
+      }
+
+      checkEmptyFeedState();
+    }
+
+    function undoCardDelete() {
+      if (!pendingDeletedItem) return;
+      if (undoTimer) clearTimeout(undoTimer);
+
+      const { element, parent, nextSibling, badge } = pendingDeletedItem;
+      if (nextSibling) {
+        parent.insertBefore(element, nextSibling);
+      } else {
+        parent.appendChild(element);
+      }
+
+      // Reverse collapse animation
+      requestAnimationFrame(() => {
+        element.classList.remove('collapsing');
+        const card = element.querySelector('.media-card');
+        if (card) card.style.transform = 'translateX(0)';
+      });
+
+      // Restore cache counter
+      if (badge === 'cache') {
+        state.cache.files += 1;
+        updateCacheCounters();
+      }
+
+      // Hide toast
+      const toast = document.getElementById('undoToast');
+      if (toast) toast.style.display = 'none';
+
+      pendingDeletedItem = null;
+      checkEmptyFeedState();
+    }
+
+    function commitCardDeletion(itemId) {
+      const toast = document.getElementById('undoToast');
+      if (toast) toast.style.display = 'none';
+      if (pendingDeletedItem && pendingDeletedItem.id === itemId) {
+        // Dispatch DELETE API to server
+        fetch(`/api/cache/${itemId}`, { method: 'DELETE' }).catch(() => {});
+        pendingDeletedItem = null;
+      }
+    }
+
+    function checkEmptyFeedState() {
+      const wrappers = document.querySelectorAll('.feed-item-wrapper:not(.collapsing)');
+      const emptyState = document.getElementById('feedEmptyState');
+      if (emptyState) {
+        emptyState.style.display = (wrappers.length === 0) ? 'flex' : 'none';
+      }
+    }
+
+    // ─── FEATURE 2: SUBTITLE DISPLAY MODE CONTROLLER ───
+    function setSubtitleMode(mode) {
+      state.subtitleMode = mode;
+      try {
+        localStorage.setItem('vieneu_subtitle_mode', mode);
+      } catch (e) {}
+
+      const hud = document.getElementById('subtitleHud');
+      const floatingPill = document.getElementById('floatingCcPill');
+      const floatingText = document.getElementById('floatingCcText');
+      const subDesc = document.getElementById('settingSubDesc');
+
+      // Update in-HUD 3-way segmented buttons (双 · VI · CC)
+      const btnBi = document.getElementById('hudSubBilingual');
+      const btnVi = document.getElementById('hudSubViOnly');
+      const btnOff = document.getElementById('hudSubOff');
+      if (btnBi) btnBi.classList.toggle('active', mode === 'bilingual');
+      if (btnVi) btnVi.classList.toggle('active', mode === 'vi_only');
+      if (btnOff) btnOff.classList.toggle('active', mode === 'off');
+
+      // Update Settings screen 3-way segmented buttons
+      const setBi = document.getElementById('settingSubBilingual');
+      const setVi = document.getElementById('settingSubViOnly');
+      const setOff = document.getElementById('settingSubOff');
+      if (setBi) setBi.classList.toggle('active', mode === 'bilingual');
+      if (setVi) setVi.classList.toggle('active', mode === 'vi_only');
+      if (setOff) setOff.classList.toggle('active', mode === 'off');
+
+      if (hud) {
+        hud.classList.remove('mode-vi-only', 'mode-off');
+        if (mode === 'vi_only') {
+          hud.classList.add('mode-vi-only');
+        } else if (mode === 'off') {
+          hud.classList.add('mode-off');
+        }
+      }
+
+      if (subDesc) {
+        if (mode === 'bilingual') subDesc.textContent = 'Hiển thị song ngữ gốc và dịch';
+        else if (mode === 'vi_only') subDesc.textContent = 'Chỉ hiển thị phụ đề dịch tiếng Việt (56px)';
+        else subDesc.textContent = 'Đã tắt toàn bộ phụ đề (ẩn HUD)';
+      }
+
+      // Handle Floating CC Pill behavior on Video
+      if (floatingPill) {
+        if (mode === 'off') {
+          floatingPill.style.display = 'flex';
+          floatingPill.style.opacity = '1';
+          if (floatingText) floatingText.textContent = 'CC Tắt';
+          // After 2.2 seconds, dim down to small clickable "CC" badge
+          setTimeout(() => {
+            if (state.subtitleMode === 'off' && floatingText) {
+              floatingText.textContent = 'CC';
+              floatingPill.style.opacity = '0.75';
+            }
+          }, 2200);
+        } else {
+          floatingPill.style.display = 'none';
+        }
+      }
+    }
+
+    // Init Subtitle Mode from storage
+    (function initSubtitleMode() {
+      let saved = 'bilingual';
+      try {
+        saved = localStorage.getItem('vieneu_subtitle_mode') || 'bilingual';
+      } catch (e) {}
+      setSubtitleMode(saved);
+    })();
+
+    // ─── FEATURE 3: CACHE MANAGEMENT & CLEARING LOGIC ───
+    function updateCacheCounters() {
+      const filesEl = document.getElementById('cacheFilesCount');
+      const sizeEl = document.getElementById('cacheSizeText');
+      const oldestEl = document.getElementById('cacheOldestText');
+      const badgeEl = document.getElementById('feedCacheSizeBadge');
+
+      if (filesEl) filesEl.textContent = `${state.cache.files} files`;
+      if (sizeEl) sizeEl.textContent = `${state.cache.sizeMB.toFixed(1)} MB`;
+      if (oldestEl) oldestEl.textContent = (state.cache.files > 0) ? `Cũ nhất: ${state.cache.oldestDays} ngày trước` : 'Trống';
+      if (badgeEl) badgeEl.textContent = `${state.cache.files} files đệm`;
+    }
+
+    function handleClearTempCache() {
+      const btn = document.getElementById('btnClearTempCache');
+      const toast = document.getElementById('cacheToastMsg');
+
+      if (btn) btn.style.pointerEvents = 'none';
+      fetch('/api/cache/temp', { method: 'DELETE' }).catch(() => {});
+
+      if (toast) {
+        toast.className = 'cache-toast-msg success';
+        toast.textContent = `✓ Đã dọn dẹp cache tạm · Giữ nguyên ${state.cache.files} files audio`;
+        toast.style.display = 'block';
+        setTimeout(() => {
+          toast.style.display = 'none';
+          if (btn) btn.style.pointerEvents = 'auto';
+        }, 3000);
+      }
+    }
+
+    function openClearAllSheet() {
+      const backdrop = document.getElementById('clearAllBackdrop');
+      const sheet = document.getElementById('clearAllSheet');
+      if (backdrop) backdrop.classList.add('active');
+      if (sheet) sheet.classList.add('active');
+    }
+
+    function closeClearAllSheet() {
+      const backdrop = document.getElementById('clearAllBackdrop');
+      const sheet = document.getElementById('clearAllSheet');
+      if (backdrop) backdrop.classList.remove('active');
+      if (sheet) sheet.classList.remove('active');
+    }
+
+    function confirmClearAllCache() {
+      closeClearAllSheet();
+
+      // Lock buttons
+      const btnGroup = document.getElementById('cacheBtnContainer');
+      if (btnGroup) {
+        btnGroup.style.opacity = '0.4';
+        btnGroup.style.pointerEvents = 'none';
+      }
+
+      // Odometer Countdown Animation (600ms ease-out)
+      const startFiles = state.cache.files;
+      const startSize = state.cache.sizeMB;
+      const duration = 600;
+      const startTime = performance.now();
+
+      function tick(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+
+        const currentFiles = Math.round(startFiles * (1 - easeOut));
+        const currentSize = (startSize * (1 - easeOut));
+
+        const filesEl = document.getElementById('cacheFilesCount');
+        const sizeEl = document.getElementById('cacheSizeText');
+        if (filesEl) filesEl.textContent = `${currentFiles} files`;
+        if (sizeEl) sizeEl.textContent = `${currentSize.toFixed(1)} MB`;
+
+        if (progress < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          // Finalize state
+          state.cache.files = 0;
+          state.cache.sizeMB = 0;
+          state.cache.oldestDays = 0;
+          updateCacheCounters();
+
+          // Flip all history cached badges from 0s Chờ to 60s Nạp
+          document.querySelectorAll('.card-badge.badge-cache').forEach(b => {
+            b.className = 'card-badge badge-wait';
+            b.textContent = '60s Nạp';
+          });
+
+          // Dispatch backend delete
+          fetch('/api/cache/all', { method: 'DELETE' }).catch(() => {});
+
+          // Re-enable buttons and show success toast
+          if (btnGroup) {
+            btnGroup.style.opacity = '1';
+            btnGroup.style.pointerEvents = 'auto';
+          }
+
+          const toast = document.getElementById('cacheToastMsg');
+          if (toast) {
+            toast.className = 'cache-toast-msg success';
+            toast.textContent = `✓ Đã xoá ${startFiles} files · Giải phóng ${startSize.toFixed(1)} MB`;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3500);
+          }
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+
     // ─── MODEL & VOICE CONTROLLER ───
     function selectModel(modelKey) {
       state.model = modelKey;
       
-      // Update Tab CSS
       document.querySelectorAll('.model-tab').forEach(tab => {
         tab.classList.toggle('active', tab.getAttribute('onclick').includes(modelKey));
       });
 
-      // Update Top Status Bar Indicator
       const statusIndicator = document.getElementById('statusBarIndicator');
       const statusText = document.getElementById('statusBarText');
       statusIndicator.className = 'server-status-dot ' + modelKey;
@@ -2114,7 +2970,6 @@
       document.getElementById('modelDescText').innerHTML = `<span>${descMap[modelKey]}</span>`;
       statusText.textContent = statusMap[modelKey];
 
-      // Set default active voice for model
       state.activeVoice = state.voicesByModel[modelKey][0].name;
 
       renderVoiceChips();
@@ -2269,7 +3124,6 @@
           circleEl.style.strokeDashoffset = offset;
         }
 
-        // Real-time stage messaging
         if (sec > 45) {
           if (titleEl) titleEl.textContent = "Đang tải & dịch phụ đề qua Groq AI...";
           if (subEl) subEl.textContent = "⚡ Phân tích câu thoại tiếng Anh và dịch sang Tiếng Việt";
@@ -2333,8 +3187,10 @@
       }, 300);
     }
 
-    // Initialize Model
+    // Initialize Components
     selectModel('vieneu');
+    initSwipeListeners();
+    updateCacheCounters();
 
     // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
