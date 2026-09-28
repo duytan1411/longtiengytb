@@ -30,7 +30,7 @@
 ## 🚀 Hướng Dẫn Cài Đặt & Sử Dụng Trên Điện Thoại
 
 ### Cách 1: Sử dụng qua GitHub Pages (Trực tiếp trên điện thoại)
-1. Truy cập liên kết: **[https://duytan1411.github.io/LongTiengVideoYTB/](https://duytan1411.github.io/LongTiengVideoYTB/)**
+1. Truy cập liên kết: **[https://duytan1411.github.io/longtiengytb/](https://duytan1411.github.io/longtiengytb/)**
 2. **Trên iPhone (Safari):** Nhấn nút **Chia sẻ (Share)** ở thanh công cụ dưới ➔ Chọn **"Thêm vào Màn hình chính" (Add to Home Screen)**.
 3. **Trên Android (Chrome):** Nhấn menu 3 chấm ở góc trên ➔ Chọn **"Cài đặt ứng dụng"** hoặc **"Thêm vào màn hình chính"**.
 4. Mở ứng dụng từ icon trên màn hình chính: Ứng dụng chạy toàn màn hình (Standalone PWA) không có thanh địa chỉ trình duyệt.
