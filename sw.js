@@ -1,5 +1,5 @@
 // VieNeu Mobile Player Service Worker
-const CACHE_NAME = 'vieneu-pwa-v1';
+const CACHE_NAME = 'vieneu-pwa-v1.2.0';
 const ASSETS = [
   './',
   './index.html',
@@ -10,12 +10,12 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS);
     })
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -36,6 +36,24 @@ self.addEventListener('fetch', (event) => {
   if (event.request.url.includes('youtube.com') || event.request.url.includes('api')) {
     return;
   }
+
+  // Network-first for HTML pages so updates are seen immediately
+  if (event.request.mode === 'navigate' || event.request.headers.get('accept')?.includes('text/html')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Cache-first with background revalidate for other assets
   event.respondWith(
     caches.match(event.request).then((cached) => {
       return cached || fetch(event.request);
