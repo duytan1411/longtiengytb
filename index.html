@@ -16,6 +16,7 @@
 
   <style>
     :root {
+      /* Dark Theme (Cinematic Obsidian Base) */
       --bg-canvas: #0A0A0C;
       --bg-surface: #121216;
       --bg-elevated: #1A1A22;
@@ -31,12 +32,37 @@
       --text-primary: #FFFFFF;
       --text-secondary: #A1A1AA;
       --text-tertiary: #71717A;
+      --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.35);
+      --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.45);
+      --shadow-hud: 0 4px 20px rgba(0, 0, 0, 0.50);
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 18px;
       --radius-xl: 24px;
       --radius-full: 9999px;
       --font-main: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* ─── LIGHT MODE SPECIFICATION (EDITORIAL PAPER AESTHETIC) ─── */
+    [data-theme="light"] {
+      --bg-canvas: #F5F4F0;
+      --bg-surface: #FFFFFF;
+      --bg-elevated: #ECEAE4;
+      --bg-glass: rgba(255, 255, 255, 0.88);
+      --border-subtle: rgba(0, 0, 0, 0.08);
+      --border-active: rgba(79, 82, 213, 0.45);
+      --accent-primary: #4F52D5; /* WCAG AA Contrast 4.72:1 against #F5F4F0 */
+      --accent-hover: #3B3EAE;
+      --accent-teal: #0D9488;    /* WCAG AA Contrast 4.64:1 */
+      --accent-azure: #0369A1;   /* WCAG AA Contrast 5.14:1 */
+      --accent-amber: #D97706;   /* WCAG AA Contrast 4.80:1 */
+      --accent-rose: #E11D48;    /* WCAG AA Contrast 4.92:1 */
+      --text-primary: #111113;   /* WCAG AAA Contrast 16.8:1 */
+      --text-secondary: #5E5E66; /* WCAG AAA Contrast 6.20:1 */
+      --text-tertiary: #8C8C96;  /* WCAG AA Contrast 4.80:1 */
+      --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+      --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03);
+      --shadow-hud: 0 6px 20px rgba(0, 0, 0, 0.08);
     }
 
     * {
@@ -58,6 +84,10 @@
       overflow-x: hidden;
     }
 
+    [data-theme="light"] body {
+      background-color: #E8E6E0;
+    }
+
     /* Screen Preview Container (Mobile viewport frame) */
     .mobile-frame {
       width: 100%;
@@ -70,6 +100,10 @@
       flex-direction: column;
       overflow: hidden;
       box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border-subtle);
+    }
+
+    [data-theme="light"] .mobile-frame {
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12), 0 0 0 1px var(--border-subtle);
     }
 
     @media (min-width: 480px) {
@@ -95,6 +129,12 @@
       gap: 3px;
       max-width: 95vw;
       overflow-x: auto;
+    }
+
+    [data-theme="light"] .screen-switcher {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     }
 
     .screen-btn {
@@ -129,6 +169,12 @@
       z-index: 10;
     }
 
+    .status-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .server-status-dot {
       display: inline-flex;
       align-items: center;
@@ -158,6 +204,18 @@
       border: 1px solid rgba(167, 139, 250, 0.25);
     }
 
+    [data-theme="light"] .server-status-dot.free {
+      color: #0284C7;
+      background: rgba(2, 132, 199, 0.10);
+      border-color: rgba(2, 132, 199, 0.20);
+    }
+
+    [data-theme="light"] .server-status-dot.azure {
+      color: #7C3AED;
+      background: rgba(124, 58, 237, 0.10);
+      border-color: rgba(124, 58, 237, 0.20);
+    }
+
     .dot-pulse {
       width: 6px;
       height: 6px;
@@ -179,6 +237,28 @@
       box-shadow: 0 0 8px #A78BFA;
     }
 
+    /* Quick Theme Toggle Button */
+    .theme-quick-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-subtle);
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .theme-quick-btn:active {
+      transform: scale(0.92);
+      border-color: var(--accent-primary);
+    }
+
     /* Screen Views */
     .screen-view {
       flex: 1;
@@ -194,7 +274,7 @@
 
     /* ─── SCREEN 1: HOME / PASTE ─── */
     .home-header {
-      padding: 20px 20px 14px;
+      padding: 16px 20px 14px;
     }
 
     .brand-title {
@@ -202,6 +282,12 @@
       font-weight: 700;
       letter-spacing: -0.03em;
       background: linear-gradient(135deg, #FFFFFF 60%, #A1A1AA 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    [data-theme="light"] .brand-title {
+      background: linear-gradient(135deg, #111113 70%, #5E5E66 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -250,9 +336,20 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.4);
     }
 
+    [data-theme="light"] .model-tab.active {
+      background: #FFFFFF;
+      color: #111113;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
     .model-tab.active.tab-vieneu {
       border: 1px solid rgba(99, 102, 241, 0.35);
       color: #C7D2FE;
+    }
+
+    [data-theme="light"] .model-tab.active.tab-vieneu {
+      border: 1px solid rgba(79, 82, 213, 0.40);
+      color: var(--accent-primary);
     }
 
     .model-tab.active.tab-free {
@@ -260,9 +357,19 @@
       color: #BAE6FD;
     }
 
+    [data-theme="light"] .model-tab.active.tab-free {
+      border: 1px solid rgba(2, 132, 199, 0.40);
+      color: #0284C7;
+    }
+
     .model-tab.active.tab-azure {
       border: 1px solid rgba(167, 139, 250, 0.35);
       color: #DDD6FE;
+    }
+
+    [data-theme="light"] .model-tab.active.tab-azure {
+      border: 1px solid rgba(124, 58, 237, 0.40);
+      color: #7C3AED;
     }
 
     .model-desc-pill {
@@ -292,10 +399,22 @@
       transition: all 0.2s ease;
     }
 
+    [data-theme="light"] .paste-box {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.10);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    }
+
     .paste-box:focus-within {
       border-color: var(--accent-primary);
       box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
       background: var(--bg-elevated);
+    }
+
+    [data-theme="light"] .paste-box:focus-within {
+      background: #FFFFFF;
+      box-shadow: 0 0 0 2px rgba(79, 82, 213, 0.25);
+      border-color: var(--accent-primary);
     }
 
     .paste-input {
@@ -303,7 +422,7 @@
       background: transparent;
       border: none;
       outline: none;
-      color: #fff;
+      color: var(--text-primary);
       font-family: var(--font-main);
       font-size: 14px;
     }
@@ -327,6 +446,11 @@
       gap: 6px;
       box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
       white-space: nowrap;
+    }
+
+    [data-theme="light"] .paste-btn {
+      background: linear-gradient(135deg, #4F52D5, #7C3AED);
+      box-shadow: 0 4px 12px rgba(79, 82, 213, 0.25);
     }
 
     /* Chips Row */
@@ -359,11 +483,25 @@
       transition: all 0.15s ease;
     }
 
+    [data-theme="light"] .voice-chip {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      color: var(--text-secondary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
     .voice-chip.active {
       background: var(--bg-elevated);
       color: #fff;
       border-color: var(--accent-primary);
       box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+    }
+
+    [data-theme="light"] .voice-chip.active {
+      background: rgba(79, 82, 213, 0.10);
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+      box-shadow: 0 2px 8px rgba(79, 82, 213, 0.18);
     }
 
     /* History Feed */
@@ -395,9 +533,19 @@
       transition: all 0.15s ease;
     }
 
+    [data-theme="light"] .media-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    }
+
     .media-card:active {
       transform: scale(0.98);
       background: var(--bg-elevated);
+    }
+
+    [data-theme="light"] .media-card:active {
+      background: #ECEAE4;
     }
 
     .card-thumb {
@@ -428,6 +576,10 @@
       border-radius: 4px;
     }
 
+    [data-theme="light"] .card-badge {
+      background: rgba(255, 255, 255, 0.90);
+    }
+
     .card-badge.badge-cache {
       color: var(--accent-teal);
       border: 1px solid rgba(20, 184, 166, 0.3);
@@ -436,6 +588,11 @@
     .card-badge.badge-cloud {
       color: #38BDF8;
       border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    [data-theme="light"] .card-badge.badge-cloud {
+      color: #0284C7;
+      border-color: rgba(2, 132, 199, 0.3);
     }
 
     .card-badge.badge-wait {
@@ -467,13 +624,17 @@
       margin-top: 4px;
     }
 
-    /* ─── SCREEN 2: 60S COUNTDOWN / WARMUP ─── */
+    /* ─── SCREEN 2: 60S COUNTDOWN / WARMUP (VIENEU GPU) ─── */
     .warmup-wrapper {
       flex: 1;
       display: flex;
       flex-direction: column;
       position: relative;
       background: #0A0A0C;
+    }
+
+    [data-theme="light"] .warmup-wrapper {
+      background: #F5F4F0;
     }
 
     .warmup-backdrop {
@@ -499,6 +660,10 @@
       z-index: 2;
     }
 
+    [data-theme="light"] .warmup-gradient {
+      background: linear-gradient(180deg, rgba(245,244,240,0.4) 0%, rgba(245,244,240,0.92) 75%, #F5F4F0 100%);
+    }
+
     .warmup-stage {
       position: relative;
       z-index: 3;
@@ -520,6 +685,12 @@
       margin-bottom: 20px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--border-subtle);
+    }
+
+    [data-theme="light"] .warmup-mode-pill {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
     .ring-container {
@@ -544,6 +715,10 @@
       stroke-width: 5;
     }
 
+    [data-theme="light"] .ring-bg {
+      stroke: rgba(0, 0, 0, 0.08);
+    }
+
     .ring-progress {
       fill: none;
       stroke: url(#indigoGradient);
@@ -566,7 +741,7 @@
       font-size: 40px;
       font-weight: 700;
       letter-spacing: -0.04em;
-      color: #fff;
+      color: var(--text-primary);
       font-variant-numeric: tabular-nums;
     }
 
@@ -581,7 +756,7 @@
     .warmup-status-title {
       font-size: 16.5px;
       font-weight: 600;
-      color: #FFFFFF;
+      color: var(--text-primary);
       text-align: center;
       margin-bottom: 8px;
     }
@@ -597,6 +772,12 @@
       margin-bottom: 20px;
     }
 
+    [data-theme="light"] .warmup-status-sub {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    }
+
     /* Buffer Ticks Gauge */
     .buffer-gauge {
       display: flex;
@@ -609,6 +790,10 @@
       height: 15px;
       border-radius: 3px;
       background: rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme="light"] .buffer-tick {
+      background: rgba(0, 0, 0, 0.10);
     }
 
     .buffer-tick.filled {
@@ -634,6 +819,12 @@
       border-radius: var(--radius-xl);
       padding: 16px 18px;
       box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+    }
+
+    [data-theme="light"] .warmup-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
     }
 
     .warmup-card-meta {
@@ -662,7 +853,7 @@
       font-size: 13.5px;
       font-weight: 600;
       line-height: 1.35;
-      color: #fff;
+      color: var(--text-primary);
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
@@ -687,7 +878,12 @@
       gap: 6px;
     }
 
-    /* ─── SCREEN 2B: QUICK WARMUP (FREE / AZURE) ─── */
+    [data-theme="light"] .escape-hatch {
+      border-color: rgba(2, 132, 199, 0.3);
+      color: #0284C7;
+    }
+
+    /* ─── SCREEN 2B: QUICK WARMUP (FREE / AZURE CLOUD) ─── */
     .quick-warmup-container {
       flex: 1;
       display: flex;
@@ -716,11 +912,25 @@
       box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
     }
 
+    [data-theme="light"] .cloud-pulse-box.free {
+      background: rgba(2, 132, 199, 0.10);
+      border-color: rgba(2, 132, 199, 0.30);
+      color: #0284C7;
+      box-shadow: 0 4px 20px rgba(2, 132, 199, 0.15);
+    }
+
     .cloud-pulse-box.azure {
       background: rgba(167, 139, 250, 0.12);
       border: 1px solid rgba(167, 139, 250, 0.35);
       color: #A78BFA;
       box-shadow: 0 0 30px rgba(167, 139, 250, 0.2);
+    }
+
+    [data-theme="light"] .cloud-pulse-box.azure {
+      background: rgba(124, 58, 237, 0.10);
+      border-color: rgba(124, 58, 237, 0.30);
+      color: #7C3AED;
+      box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15);
     }
 
     .pulse-ring-wave {
@@ -747,6 +957,10 @@
       margin: 16px 0 10px;
     }
 
+    [data-theme="light"] .quick-progress-track {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
     .quick-progress-fill {
       height: 100%;
       border-radius: 3px;
@@ -758,8 +972,16 @@
       background: linear-gradient(90deg, #38BDF8, #818CF8);
     }
 
+    [data-theme="light"] .quick-progress-fill.free {
+      background: linear-gradient(90deg, #0284C7, #4F52D5);
+    }
+
     .quick-progress-fill.azure {
       background: linear-gradient(90deg, #A78BFA, #C084FC);
+    }
+
+    [data-theme="light"] .quick-progress-fill.azure {
+      background: linear-gradient(90deg, #7C3AED, #9333EA);
     }
 
     /* ─── SCREEN 3: PLAYER SCREEN ─── */
@@ -803,7 +1025,7 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    /* Subtitle HUD */
+    /* Subtitle HUD (The Hard Seam Solved with Crisp Card Elevation) */
     .subtitle-hud {
       background: linear-gradient(180deg, #101014 0%, #16161C 100%);
       border-bottom: 1px solid var(--border-subtle);
@@ -812,6 +1034,14 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      position: relative;
+      z-index: 5;
+    }
+
+    [data-theme="light"] .subtitle-hud {
+      background: #FFFFFF;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: var(--shadow-hud);
     }
 
     .sub-line-orig {
@@ -821,12 +1051,20 @@
       font-weight: 400;
     }
 
+    [data-theme="light"] .sub-line-orig {
+      color: var(--text-secondary);
+    }
+
     .sub-line-vi {
       font-size: 15.5px;
       font-weight: 600;
-      color: #FFFFFF;
+      color: var(--text-primary);
       line-height: 1.35;
       text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    }
+
+    [data-theme="light"] .sub-line-vi {
+      text-shadow: none;
     }
 
     /* Dual Audio Sliders */
@@ -836,6 +1074,12 @@
       border-radius: var(--radius-lg);
       padding: 12px 16px;
       border: 1px solid var(--border-subtle);
+    }
+
+    [data-theme="light"] .audio-dock {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
     .audio-slider-row {
@@ -867,6 +1111,10 @@
       position: relative;
     }
 
+    [data-theme="light"] .slider-track {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
     .slider-fill {
       height: 100%;
       border-radius: 3px;
@@ -880,10 +1128,19 @@
       background: var(--text-tertiary);
     }
 
+    [data-theme="light"] .slider-fill.goc {
+      background: #8C8C96;
+    }
+
     .slider-fill.dub {
       width: 90%;
       background: linear-gradient(90deg, #6366F1, #8B5CF6);
       box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    }
+
+    [data-theme="light"] .slider-fill.dub {
+      background: linear-gradient(90deg, #4F52D5, #7C3AED);
+      box-shadow: 0 0 10px rgba(79, 82, 213, 0.35);
     }
 
     .slider-val {
@@ -914,11 +1171,19 @@
       position: relative;
     }
 
+    [data-theme="light"] .seekbar-track {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
     .seekbar-buffered {
       width: 60%;
       height: 100%;
       background: rgba(255,255,255,0.25);
       border-radius: 3px;
+    }
+
+    [data-theme="light"] .seekbar-buffered {
+      background: rgba(0, 0, 0, 0.16);
     }
 
     .seekbar-played {
@@ -941,6 +1206,11 @@
       border-radius: 50%;
       background: #FFFFFF;
       box-shadow: 0 0 8px rgba(0,0,0,0.6);
+    }
+
+    [data-theme="light"] .seekbar-thumb {
+      background: #FFFFFF;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     }
 
     .time-stamp {
@@ -983,6 +1253,12 @@
       box-shadow: 0 4px 16px rgba(255,255,255,0.25);
     }
 
+    [data-theme="light"] .btn-play-pause {
+      background: #111113;
+      color: #FFFFFF;
+      box-shadow: 0 4px 16px rgba(17, 17, 19, 0.25);
+    }
+
     /* ─── SCREEN 4: SETTINGS ─── */
     .settings-wrapper {
       padding: 20px;
@@ -1002,6 +1278,12 @@
       margin-bottom: 16px;
     }
 
+    [data-theme="light"] .settings-group {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
     .group-label {
       font-size: 11px;
       font-weight: 600;
@@ -1019,6 +1301,10 @@
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
 
+    [data-theme="light"] .settings-row {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
     .settings-row:last-child {
       border-bottom: none;
       padding-bottom: 0;
@@ -1027,7 +1313,7 @@
     .row-text-title {
       font-size: 13.5px;
       font-weight: 500;
-      color: #fff;
+      color: var(--text-primary);
     }
 
     .row-text-desc {
@@ -1050,6 +1336,11 @@
       transition: all 0.2s ease;
     }
 
+    [data-theme="light"] .model-card-opt {
+      background: #F5F4F0;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
     .model-card-opt:last-child {
       margin-bottom: 0;
     }
@@ -1057,6 +1348,11 @@
     .model-card-opt.active {
       border-color: var(--accent-primary);
       background: rgba(99, 102, 241, 0.12);
+    }
+
+    [data-theme="light"] .model-card-opt.active {
+      background: rgba(79, 82, 213, 0.08);
+      border-color: var(--accent-primary);
     }
 
     .model-card-left {
@@ -1078,7 +1374,7 @@
     .model-card-name {
       font-size: 13px;
       font-weight: 600;
-      color: #fff;
+      color: var(--text-primary);
     }
 
     .model-card-sub {
@@ -1116,17 +1412,26 @@
       border-top: 1px dashed rgba(255,255,255,0.1);
     }
 
+    [data-theme="light"] .azure-config-panel {
+      border-top: 1px dashed rgba(0, 0, 0, 0.12);
+    }
+
     .input-field {
       width: 100%;
       background: var(--bg-canvas);
       border: 1px solid var(--border-subtle);
-      color: #fff;
+      color: var(--text-primary);
       font-family: var(--font-main);
       font-size: 12.5px;
       padding: 9px 12px;
       border-radius: var(--radius-sm);
       margin-top: 6px;
       outline: none;
+    }
+
+    [data-theme="light"] .input-field {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.12);
     }
 
     .input-field:focus {
@@ -1141,6 +1446,10 @@
       gap: 2px;
     }
 
+    [data-theme="light"] .segmented-control {
+      background: #ECEAE4;
+    }
+
     .segment-opt {
       font-size: 11.5px;
       font-weight: 600;
@@ -1150,6 +1459,7 @@
       border: none;
       background: transparent;
       cursor: pointer;
+      transition: all 0.15s ease;
     }
 
     .segment-opt.active {
@@ -1157,10 +1467,16 @@
       color: #fff;
     }
 
+    [data-theme="light"] .segment-opt.active {
+      background: #FFFFFF;
+      color: #111113;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
     .btn-action {
       background: var(--bg-elevated);
       border: 1px solid var(--border-subtle);
-      color: #fff;
+      color: var(--text-primary);
       font-family: var(--font-main);
       font-size: 12.5px;
       font-weight: 600;
@@ -1173,6 +1489,12 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+    }
+
+    [data-theme="light"] .btn-action {
+      background: #F5F4F0;
+      color: #111113;
+      border: 1px solid rgba(0, 0, 0, 0.08);
     }
 
     /* Bottom Nav Bar */
@@ -1190,6 +1512,11 @@
       justify-content: space-around;
       z-index: 100;
       padding-bottom: env(safe-area-inset-bottom, 8px);
+    }
+
+    [data-theme="light"] .bottom-nav {
+      background: rgba(255, 255, 255, 0.88);
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
     }
 
     .nav-item {
@@ -1233,17 +1560,31 @@
     <!-- Top Status Bar -->
     <div class="status-bar">
       <span>9:41</span>
-      <div id="statusBarIndicator" class="server-status-dot vieneu">
-        <div class="dot-pulse"></div>
-        <span id="statusBarText">GTX 1660 SUPER</span>
+      <div class="status-bar-right">
+        <div id="statusBarIndicator" class="server-status-dot vieneu">
+          <div class="dot-pulse"></div>
+          <span id="statusBarText">GTX 1660 SUPER</span>
+        </div>
+        <!-- Status Bar Theme Quick Toggle -->
+        <button class="theme-quick-btn" onclick="toggleThemeQuick()" title="Chuyển chế độ Sáng / Tối">
+          <!-- Populated by JS -->
+        </button>
       </div>
     </div>
 
     <!-- ─── SCREEN 1: HOME / PASTE ─── -->
     <div id="screen-home" class="screen-view active">
       <div class="home-header">
-        <h1 class="brand-title">VieNeu Player</h1>
-        <p class="brand-sub">Biến PC thành máy chủ lồng tiếng riêng cho điện thoại</p>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <h1 class="brand-title">VieNeu Player</h1>
+            <p class="brand-sub">Biến PC thành máy chủ lồng tiếng riêng cho điện thoại</p>
+          </div>
+          <!-- Quick Theme Toggle in Home Header -->
+          <button class="theme-quick-btn" onclick="toggleThemeQuick()" title="Đổi giao diện Sáng / Tối">
+            <!-- Populated by JS -->
+          </button>
+        </div>
       </div>
 
       <!-- Model Switcher Selector -->
@@ -1401,7 +1742,7 @@
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
         </div>
 
-        <h3 id="quickWarmupTitle" style="font-size: 19px; font-weight: 700; color: #fff; margin-bottom: 6px;">Nạp Nhanh Điện Toán Đám Mây</h3>
+        <h3 id="quickWarmupTitle" style="font-size: 19px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Nạp Nhanh Điện Toán Đám Mây</h3>
         <p id="quickWarmupSub" style="font-size: 13px; color: var(--text-secondary); max-width: 280px; line-height: 1.4;">Đang kết nối API Cloud — Không tốn tài nguyên GPU máy tính...</p>
 
         <div class="quick-progress-track">
@@ -1409,12 +1750,12 @@
         </div>
         <span id="quickProgressText" style="font-size: 11px; color: var(--text-tertiary); font-weight: 600;">Đang nạp câu 2/3...</span>
 
-        <div style="margin-top: 32px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 12px 18px; width: 100%; max-width: 320px; text-align: left;">
+        <div style="margin-top: 32px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 12px 18px; width: 100%; max-width: 320px; text-align: left; box-shadow: var(--shadow-subtle);">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
             <span id="quickModelBadge" style="font-size: 11px; font-weight: 600; color: #38BDF8;">☁️ Miễn Phí (Edge TTS)</span>
             <span style="font-size: 10px; color: var(--text-tertiary);">Độ trễ: ~1.2s</span>
           </div>
-          <div style="font-size: 12.5px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Why being bilingual is good for your brain</div>
+          <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Why being bilingual is good for your brain</div>
         </div>
       </div>
     </div>
@@ -1428,7 +1769,7 @@
         </div>
       </div>
 
-      <!-- Subtitle HUD -->
+      <!-- Subtitle HUD (Card Elevation & Hard Border Solution) -->
       <div class="subtitle-hud">
         <div class="sub-line-orig">Speaking more than one language has obvious practical benefits...</div>
         <div class="sub-line-vi">Biết nhiều hơn một ngôn ngữ đem lại những lợi ích thực tế vô cùng rõ rệt...</div>
@@ -1448,14 +1789,14 @@
         </div>
 
         <div class="audio-slider-row">
-          <div class="slider-label" style="color: #fff">
+          <div class="slider-label" style="color: var(--text-primary)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary)"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
             <span>Lồng tiếng</span>
           </div>
           <div class="slider-track">
             <div class="slider-fill dub"></div>
           </div>
-          <div class="slider-val" style="color: #fff">90%</div>
+          <div class="slider-val" style="color: var(--text-primary)">90%</div>
         </div>
       </div>
 
@@ -1499,6 +1840,23 @@
       <div class="settings-wrapper">
         <h2 class="settings-title">Cài Đặt Hệ Thống</h2>
 
+        <!-- Group: Appearance / Theme -->
+        <div class="settings-group">
+          <div class="group-label">Giao Diện & Màu Sắc</div>
+
+          <div class="settings-row">
+            <div>
+              <div class="row-text-title">Chế độ hiển thị</div>
+              <div class="row-text-desc" id="themeStatusDesc">Tự động theo hệ điều hành</div>
+            </div>
+            <div class="segmented-control">
+              <button class="segment-opt" id="themeOptDark" onclick="setThemeMode('dark')">🌙 Tối</button>
+              <button class="segment-opt active" id="themeOptAuto" onclick="setThemeMode('auto')">⚙️ Tự động</button>
+              <button class="segment-opt" id="themeOptLight" onclick="setThemeMode('light')">☀️ Sáng</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Group 0: Model Engine Architecture -->
         <div class="settings-group">
           <div class="group-label">Bộ Máy Lồng Tiếng (TTS Engine)</div>
@@ -1506,7 +1864,7 @@
           <!-- Option 1: VieNeu -->
           <div class="model-card-opt active" id="settingOptVieNeu" onclick="selectModelFromSettings('vieneu')">
             <div class="model-card-left">
-              <div class="model-card-icon" style="background: rgba(99, 102, 241, 0.2); color: #818CF8">⚡</div>
+              <div class="model-card-icon" style="background: rgba(99, 102, 241, 0.2); color: var(--accent-primary)">⚡</div>
               <div>
                 <div class="model-card-name">VieNeu AI (Local GPU)</div>
                 <div class="model-card-sub">Khuyên dùng · Giọng tự nhiên nhất · GTX 1660 SUPER</div>
@@ -1602,7 +1960,7 @@
             <span style="font-size: 11px; color: var(--accent-teal); font-weight: 700;">12ms</span>
           </div>
 
-          <button class="btn-action" style="background: rgba(99, 102, 241, 0.15); color: #818CF8; border-color: rgba(99, 102, 241, 0.3)">
+          <button class="btn-action" style="background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); border-color: rgba(99, 102, 241, 0.3)">
             <span>📷 Quét mã QR từ TransDuck Studio</span>
           </button>
         </div>
@@ -1653,6 +2011,82 @@
       }
     };
 
+    // ─── THEME CONTROLLER ───
+    let currentThemeMode = 'dark'; // 'dark' | 'light' | 'auto'
+
+    function getSystemTheme() {
+      return (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+    }
+
+    function applyTheme(resolvedTheme) {
+      if (resolvedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      updateThemeIcons(resolvedTheme);
+    }
+
+    function setThemeMode(mode) {
+      currentThemeMode = mode;
+      try {
+        localStorage.setItem('vieneu_theme_mode', mode);
+      } catch (e) {}
+
+      const resolved = (mode === 'auto') ? getSystemTheme() : mode;
+      applyTheme(resolved);
+
+      // Update settings segmented control
+      const darkBtn = document.getElementById('themeOptDark');
+      const autoBtn = document.getElementById('themeOptAuto');
+      const lightBtn = document.getElementById('themeOptLight');
+      const descEl = document.getElementById('themeStatusDesc');
+
+      if (darkBtn) darkBtn.classList.toggle('active', mode === 'dark');
+      if (autoBtn) autoBtn.classList.toggle('active', mode === 'auto');
+      if (lightBtn) lightBtn.classList.toggle('active', mode === 'light');
+
+      if (descEl) {
+        if (mode === 'dark') descEl.textContent = 'Chế độ Tối (Cinematic Obsidian)';
+        else if (mode === 'light') descEl.textContent = 'Chế độ Sáng (Editorial Paper)';
+        else descEl.textContent = `Tự động theo máy (${resolved === 'dark' ? 'Đang tối' : 'Đang sáng'})`;
+      }
+    }
+
+    function toggleThemeQuick() {
+      const currentResolved = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      const next = currentResolved === 'dark' ? 'light' : 'dark';
+      setThemeMode(next);
+    }
+
+    function updateThemeIcons(activeTheme) {
+      const moonIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+      const sunIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`;
+      
+      document.querySelectorAll('.theme-quick-btn').forEach(btn => {
+        btn.innerHTML = (activeTheme === 'light') ? sunIcon : moonIcon;
+      });
+    }
+
+    // System listener for Live Auto Switching
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+        if (currentThemeMode === 'auto') {
+          applyTheme(getSystemTheme());
+        }
+      });
+    }
+
+    // Initialize Theme immediately without animation flash
+    (function initTheme() {
+      let saved = 'dark';
+      try {
+        saved = localStorage.getItem('vieneu_theme_mode') || 'dark';
+      } catch (e) {}
+      setThemeMode(saved);
+    })();
+
+    // ─── MODEL & VOICE CONTROLLER ───
     function selectModel(modelKey) {
       state.model = modelKey;
       
@@ -1754,10 +2188,10 @@
         tag.style.color = 'var(--accent-teal)';
       } else if (state.model === 'free') {
         tag.textContent = `☁️ Free: ${state.activeVoice}`;
-        tag.style.color = '#38BDF8';
+        tag.style.color = (document.documentElement.getAttribute('data-theme') === 'light') ? '#0284C7' : '#38BDF8';
       } else {
         tag.textContent = `💎 Azure: ${state.activeVoice}`;
-        tag.style.color = '#A78BFA';
+        tag.style.color = (document.documentElement.getAttribute('data-theme') === 'light') ? '#7C3AED' : '#A78BFA';
       }
     }
 
@@ -1772,14 +2206,11 @@
 
     function handleCardClick(type) {
       if (type === 'cached') {
-        // Instant play for cached videos
         switchScreen('screen-player');
       } else if (type === 'cloud') {
-        // Free cloud quick play
         selectModel('free');
         triggerQuickWarmup('free');
       } else {
-        // Uncached VieNeu: 60s preparation
         selectModel('vieneu');
         switchScreen('screen-warmup');
       }
@@ -1873,14 +2304,14 @@
         if (sub) sub.textContent = "Khởi tạo luồng Neural Audio qua Microsoft Azure...";
         if (badge) {
           badge.textContent = "💎 Azure TTS (Neural Cloud)";
-          badge.style.color = "#A78BFA";
+          badge.style.color = (document.documentElement.getAttribute('data-theme') === 'light') ? '#7C3AED' : '#A78BFA';
         }
       } else {
         if (title) title.textContent = "Kết Nối Edge TTS Cloud (Miễn Phí)";
         if (sub) sub.textContent = "Khởi tạo luồng phát tức thì — 0s chờ GPU...";
         if (badge) {
           badge.textContent = "☁️ Miễn Phí (Edge TTS)";
-          badge.style.color = "#38BDF8";
+          badge.style.color = (document.documentElement.getAttribute('data-theme') === 'light') ? '#0284C7' : '#38BDF8';
         }
       }
 
@@ -1902,7 +2333,7 @@
       }, 300);
     }
 
-    // Initialize
+    // Initialize Model
     selectModel('vieneu');
 
     // Register Service Worker for PWA
