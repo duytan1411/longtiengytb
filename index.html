@@ -41,6 +41,14 @@
       --radius-xl: 24px;
       --radius-full: 9999px;
       --font-main: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+
+      /* ─── RESPONSIVE BREAKPOINT TOKENS ─── */
+      --bp-xs: 375px;   /* XS floor (iPhone SE) */
+      --bp-sm: 390px;   /* SM canonical (iPhone 12/13/14) */
+      --bp-md: 430px;   /* MD (Plus / Max phones) */
+      --bp-tablet: 768px; /* Tablet portrait floor (iPad mini/Air) */
+      --bp-tablet-lg: 1024px; /* Tablet landscape / Pro 11" */
+      --bp-desktop: 1280px; /* Desktop / iPad Pro 13" */
     }
 
     /* ─── LIGHT MODE SPECIFICATION (EDITORIAL PAPER AESTHETIC) ─── */
@@ -73,54 +81,537 @@
       user-select: none;
     }
 
+    html, body {
+      height: 100%;
+      height: -webkit-fill-available;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      background-color: #000000;
+      background-color: var(--bg-canvas);
       color: var(--text-primary);
       font-family: var(--font-main);
       display: flex;
-      justify-content: center;
-      align-items: center;
       min-height: 100vh;
+      min-height: -webkit-fill-available;
       overflow-x: hidden;
     }
 
     [data-theme="light"] body {
-      background-color: #E8E6E0;
+      background-color: var(--bg-canvas);
     }
 
-    /* Screen Preview Container (Mobile viewport frame) */
+    /* ─── RESPONSIVE APP SHELL (NO 414px CONSTRAINT) ─── */
+    .app-shell,
     .mobile-frame {
       width: 100%;
-      max-width: 414px;
       height: 100vh;
-      max-height: 896px;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
       background: var(--bg-canvas);
       position: relative;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       overflow: hidden;
-      box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border-subtle);
+      box-shadow: none;
+      border-radius: 0;
+      max-width: 100%;
+      max-height: 100%;
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
     }
 
-    [data-theme="light"] .mobile-frame {
-      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12), 0 0 0 1px var(--border-subtle);
-    }
-
-    @media (min-width: 480px) {
+    /* ─── PHONE CLASS (Default / Mobile-First: < 768px) ─── */
+    @media (max-width: 767px) {
+      .app-shell,
       .mobile-frame {
-        border-radius: 40px;
-        height: 860px;
+        flex-direction: column;
+      }
+      .nav-rail {
+        display: none !important;
+      }
+      .tablet-sidebar {
+        display: none !important;
+      }
+      .tablet-home-stage {
+        display: none !important;
+      }
+      .tablet-sidebar-nav {
+        display: none !important;
+      }
+      .bottom-nav {
+        display: flex;
+      }
+      .main-stage {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow-y: auto;
       }
     }
 
-    /* Top Floating Screen Selector (for design review) */
-    .screen-switcher {
+    /* XS (375px) — iPhone SE 3rd gen */
+    @media (max-width: 389px) {
+      .brand-title { font-size: 22px !important; }
+      .paste-box { height: 50px !important; }
+      .model-tab { font-size: 10.5px !important; }
+      .voice-chip { padding: 6px 10px !important; }
+      .bottom-nav { height: 60px !important; }
+      .card-thumb { width: 92px !important; height: 56px !important; }
+      .card-title { font-size: 12px !important; -webkit-line-clamp: 2 !important; }
+      .player-subtitles { min-height: 68px !important; }
+      .ring-container, .ring-svg { width: 152px !important; height: 152px !important; }
+      .settings-group { padding: 12px !important; }
+    }
+
+    /* MD (414px–430px) — Plus & Pro Max Phones */
+    @media (min-width: 414px) and (max-width: 767px) {
+      .brand-title { font-size: 27px; }
+      .paste-box { height: 58px; }
+      .voice-chip { padding: 8px 15px; }
+      .card-thumb { width: 116px; height: 70px; }
+      .ring-container, .ring-svg { width: 192px; height: 192px; }
+      .player-subtitles { min-height: 88px; }
+      .sub-vietnamese { font-size: 16.5px; }
+      .audio-dock { padding: 14px 18px; }
+    }
+
+    /* ─── TABLET PORTRAIT CLASS (768px – 1023px): Master + Content Split ─── */
+    @media (min-width: 768px) {
+      .app-shell,
+      .mobile-frame {
+        flex-direction: row;
+      }
+      .bottom-nav {
+        display: none !important;
+      }
+      .phone-home-content {
+        display: none !important;
+      }
+      .nav-rail {
+        display: none; /* Shown only on >= 1024px */
+      }
+      .tablet-sidebar {
+        display: flex;
+        flex-direction: column;
+        width: 280px;
+        flex-shrink: 0;
+        background: var(--bg-canvas);
+        border-right: 1px solid var(--border-subtle);
+        height: 100vh;
+        overflow-y: auto;
+        position: relative;
+        z-index: 50;
+      }
+      .tablet-sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 12px 14px;
+        background: var(--bg-canvas);
+        border-top: 1px solid var(--border-subtle);
+        margin-top: auto;
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+      }
+      .main-stage {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--bg-canvas);
+        position: relative;
+      }
+      .screen-view {
+        padding-bottom: 24px !important;
+      }
+      .tablet-home-stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+        padding: 32px 24px;
+      }
+      .expanded-preview-card {
+        max-width: 560px;
+        width: 100%;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-card);
+      }
+      /* Two-column Settings Grid */
+      .settings-grid-split {
+        display: grid;
+        grid-template-columns: calc(50% - 12px) calc(50% - 12px);
+        gap: 24px;
+        padding: 20px;
+        max-width: 900px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      /* Two-column Player Console + Transport Row */
+      .player-desktop-split {
+        display: grid;
+        grid-template-columns: 50% 50%;
+        gap: 16px;
+        padding: 12px 20px;
+        max-width: 100%;
+      }
+      .player-desktop-split .audio-dock,
+      .player-desktop-split .transport-dock {
+        margin: 0;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+      }
+      /* Warmup 220px ring */
+      .warmup-stage .ring-container,
+      .warmup-stage .ring-svg {
+        width: 220px;
+        height: 220px;
+      }
+    }
+
+    /* ─── TABLET LANDSCAPE CLASS (1024px – 1365px): Three-Pane Architecture ─── */
+    @media (min-width: 1024px) {
+      .nav-rail {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        width: 64px;
+        flex-shrink: 0;
+        height: 100vh;
+        background: var(--bg-canvas);
+        border-right: 1px solid var(--border-subtle);
+        padding: 16px 0;
+        z-index: 60;
+      }
+      .tablet-sidebar {
+        width: 300px;
+        background: var(--bg-surface);
+      }
+      .tablet-sidebar-nav {
+        display: none !important; /* Navigation moved to 64px rail */
+      }
+      .brand-title {
+        font-size: 28px;
+      }
+      .sub-vietnamese {
+        font-size: 17px;
+      }
+      .row-text-title {
+        font-size: 14.5px;
+      }
+      /* Warmup 240px ring */
+      .warmup-stage .ring-container,
+      .warmup-stage .ring-svg {
+        width: 240px;
+        height: 240px;
+      }
+    }
+
+    /* ─── LARGE TABLET / DESKTOP CLASS (1280px+): iPad Pro 13" Landscape ─── */
+    @media (min-width: 1280px) {
+      .tablet-sidebar {
+        width: 340px;
+      }
+      .player-stage-container {
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      .player-desktop-split {
+        grid-template-columns: 55% 45%; /* Transport 55% left, Audio Console 45% right */
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      .desktop-history-grid {
+        display: grid;
+        grid-template-columns: calc(50% - 12px) calc(50% - 12px);
+        gap: 24px;
+        max-width: 860px;
+        width: 100%;
+        margin: 0 auto;
+      }
+      .desktop-history-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 12px;
+        display: flex;
+        gap: 14px;
+        cursor: pointer;
+        transition: transform 0.15s ease, border-color 0.15s ease;
+      }
+      .desktop-history-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--accent-primary);
+      }
+      .desktop-history-thumb {
+        width: 160px;
+        height: 96px;
+        border-radius: var(--radius-sm);
+        object-fit: cover;
+      }
+      .desktop-history-title {
+        font-size: 13px;
+        font-weight: 600;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        color: var(--text-primary);
+      }
+    }
+
+    /* ─── NAVIGATION RAIL & SIDEBAR COMPONENT STYLING ─── */
+    .rail-top {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+    .rail-bottom {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    .rail-nav-item {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .rail-nav-item:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .rail-nav-item.active {
+      color: var(--accent-primary);
+    }
+    .rail-nav-item.active::before {
+      content: '';
       position: absolute;
+      left: 0;
+      top: 10px;
+      bottom: 10px;
+      width: 4px;
+      background: var(--accent-primary);
+      border-radius: 0 4px 4px 0;
+    }
+    .rail-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 44px;
+      padding: 0 14px;
+      border-radius: 10px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-family: var(--font-main);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      width: 100%;
+      text-align: left;
+    }
+    .sidebar-nav-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+    }
+    .sidebar-nav-item.active {
+      background: var(--bg-elevated);
+      color: var(--accent-primary);
+    }
+    .sidebar-nav-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .sidebar-header {
+      padding: 18px 16px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+    .sidebar-model-section,
+    .sidebar-paste-section,
+    .sidebar-voice-section,
+    .sidebar-history-section {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .sidebar-model-tabs {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sidebar-model-btn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-main);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .sidebar-model-btn.active {
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+      background: rgba(99, 102, 241, 0.12);
+    }
+    .sidebar-paste-box {
+      display: flex;
+      gap: 6px;
+    }
+    .sidebar-paste-input {
+      flex: 1;
+      height: 36px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      font-size: 12px;
+      padding: 0 10px;
+      outline: none;
+    }
+    .sidebar-paste-btn {
+      height: 36px;
+      padding: 0 12px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-primary);
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+    }
+    .sidebar-voice-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sidebar-voice-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .sidebar-voice-item.active {
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+      background: rgba(99, 102, 241, 0.12);
+      font-weight: 600;
+    }
+    .sidebar-feed-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .sidebar-feed-item {
+      display: flex;
+      gap: 10px;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .sidebar-feed-item:hover {
+      border-color: var(--border-subtle);
+    }
+    .sidebar-feed-item.active {
+      border-color: var(--accent-primary);
+    }
+    .sidebar-feed-thumb {
+      width: 80px;
+      height: 48px;
+      border-radius: 4px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .sidebar-feed-info {
+      flex: 1;
+      overflow: hidden;
+    }
+    .sidebar-feed-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.3;
+    }
+    .sidebar-feed-meta {
+      font-size: 10.5px;
+      color: var(--text-tertiary);
+      margin-top: 3px;
+    }
+
+    /* Top Floating Screen Selector (Hidden by default, shown via ?review=1) */
+    .screen-switcher {
+      position: fixed;
       top: 10px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 9999;
-      display: flex;
+      display: none; /* Hidden by default */
       background: rgba(26, 26, 34, 0.92);
       backdrop-filter: blur(16px);
       padding: 4px;
@@ -129,6 +620,11 @@
       gap: 3px;
       max-width: 95vw;
       overflow-x: auto;
+    }
+
+    body.review-mode .screen-switcher,
+    .screen-switcher.review-active {
+      display: flex;
     }
 
     [data-theme="light"] .screen-switcher {
@@ -1967,7 +2463,127 @@
     <button class="screen-btn" onclick="switchScreen('screen-settings')">4. Cài đặt</button>
   </div>
 
-  <div class="mobile-frame">
+  <div class="app-shell mobile-frame">
+
+    <!-- ─── PANE 1: TABLET LANDSCAPE & DESKTOP (1024px+) NAVIGATION RAIL ─── -->
+    <nav class="nav-rail" id="navRail" aria-label="Main Navigation Rail">
+      <div class="rail-top">
+        <button class="rail-nav-item active" id="railNavHome" onclick="switchScreen('screen-home')" title="Trang chủ">
+          <svg class="rail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        </button>
+        <button class="rail-nav-item" id="railNavPlayer" onclick="switchScreen('screen-player')" title="Trình phát">
+          <svg class="rail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+        </button>
+        <button class="rail-nav-item" id="railNavSettings" onclick="switchScreen('screen-settings')" title="Cài đặt">
+          <svg class="rail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+      </div>
+      <div class="rail-bottom">
+        <button class="rail-nav-item rail-theme-toggle" onclick="toggleThemeQuick()" title="Chế độ Sáng / Tối">
+          <svg class="rail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ─── PANE 2: TABLET & DESKTOP (768px+) CONTENT SIDEBAR ─── -->
+    <aside class="tablet-sidebar" id="tabletSidebar" aria-label="Content Sidebar">
+      <!-- Sidebar Header & Telemetry -->
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-title" style="font-size: 20px;">VieNeu Player</div>
+          <div class="server-status-dot vieneu" style="font-size: 10px; padding: 2px 8px;">
+            <div class="dot-pulse"></div>
+            <span>GTX 1660</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Model Selector (Vertical Stack) -->
+      <div class="sidebar-model-section">
+        <div class="sidebar-label">MÔ HÌNH LỒNG TIẾNG</div>
+        <div class="sidebar-model-tabs">
+          <button class="sidebar-model-btn active" id="sbModelVieNeu" onclick="selectModel('vieneu')">
+            <span class="model-name">⚡ VieNeu GPU Local</span>
+            <span class="model-badge">60s Nạp</span>
+          </button>
+          <button class="sidebar-model-btn" id="sbModelFree" onclick="selectModel('free')">
+            <span class="model-name">☁️ Miễn Phí Edge Cloud</span>
+            <span class="model-badge">Phát 0s</span>
+          </button>
+          <button class="sidebar-model-btn" id="sbModelAzure" onclick="selectModel('azure')">
+            <span class="model-name">💎 Azure Studio Neural</span>
+            <span class="model-badge">Pro Cloud</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sidebar Quick Paste Input -->
+      <div class="sidebar-paste-section">
+        <div class="sidebar-label">DÁN LINK YOUTUBE</div>
+        <div class="sidebar-paste-box">
+          <input type="text" id="sidebarYoutubeInput" class="sidebar-paste-input" placeholder="Dán link video..." value="https://youtube.com/watch?v=nzHY-muy2Mw">
+          <button class="sidebar-paste-btn" onclick="handleSidebarLaunch()">Phát</button>
+        </div>
+      </div>
+
+      <!-- Sidebar Voice Chips (Vertical Stack) -->
+      <div class="sidebar-voice-section">
+        <div class="sidebar-label">GIỌNG ĐỌC AI</div>
+        <div class="sidebar-voice-list" id="sidebarVoiceList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Sidebar History Feed (Scrollable) -->
+      <div class="sidebar-history-section">
+        <div class="sidebar-history-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span class="sidebar-label" style="margin-bottom: 0;">GẦN ĐÂY</span>
+          <span style="font-size: 10px; color: var(--accent-teal);" id="sidebarCacheBadge">143 files</span>
+        </div>
+        <div class="sidebar-feed-list" id="sidebarFeedList">
+          <div class="sidebar-feed-item active" onclick="handleCardClick('cached')">
+            <img class="sidebar-feed-thumb" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=160" alt="thumb">
+            <div class="sidebar-feed-info">
+              <div class="sidebar-feed-title">Why being bilingual is good for your brain | BBC Ideas</div>
+              <div class="sidebar-feed-meta">5:12 · Anh Khôi · ⚡ 0s Chờ</div>
+            </div>
+          </div>
+          <div class="sidebar-feed-item" onclick="handleCardClick('cloud')">
+            <img class="sidebar-feed-thumb" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=160" alt="thumb">
+            <div class="sidebar-feed-info">
+              <div class="sidebar-feed-title">How Quantum Computers Actually Work | Veritasium</div>
+              <div class="sidebar-feed-meta">14:20 · Hoài My · ☁️ Nhanh</div>
+            </div>
+          </div>
+          <div class="sidebar-feed-item" onclick="handleCardClick('uncached')">
+            <img class="sidebar-feed-thumb" src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=160" alt="thumb">
+            <div class="sidebar-feed-info">
+              <div class="sidebar-feed-title">The Simple Japanese Habit That Changes Everything</div>
+              <div class="sidebar-feed-meta">8:45 · GPU · ⏳ 60s Nạp</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pinned Bottom Sidebar Navigation (Visible on Tablet Portrait 768px–1023px) -->
+      <nav class="tablet-sidebar-nav" id="tabletSidebarNav" aria-label="Sidebar Navigation">
+        <button class="sidebar-nav-item active" id="sbNavHome" onclick="switchScreen('screen-home')">
+          <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span>Trang chủ</span>
+        </button>
+        <button class="sidebar-nav-item" id="sbNavPlayer" onclick="switchScreen('screen-player')">
+          <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+          <span>Trình phát</span>
+        </button>
+        <button class="sidebar-nav-item" id="sbNavSettings" onclick="switchScreen('screen-settings')">
+          <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <span>Cài đặt</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- ─── PANE 3: MAIN STAGE (FLUID VIEWPORT AREA) ─── -->
+    <main class="main-stage" id="mainStage">
 
     <!-- Top Status Bar -->
     <div class="status-bar">
@@ -1986,139 +2602,203 @@
 
     <!-- ─── SCREEN 1: HOME / PASTE ─── -->
     <div id="screen-home" class="screen-view active">
-      <div class="home-header">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <div>
-            <h1 class="brand-title">VieNeu Player</h1>
-            <p class="brand-sub">Biến PC thành máy chủ lồng tiếng riêng cho điện thoại</p>
+        <!-- Phone View Home Stack (Hidden on tablet/desktop >= 768px) -->
+        <div class="phone-home-content">
+          <div class="home-header">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <h1 class="brand-title">VieNeu Player</h1>
+                <p class="brand-sub">Biến PC thành máy chủ lồng tiếng riêng cho điện thoại</p>
+              </div>
+              <button class="theme-quick-btn" onclick="toggleThemeQuick()" title="Đổi giao diện Sáng / Tối">
+                <!-- Populated by JS -->
+              </button>
+            </div>
           </div>
-          <!-- Quick Theme Toggle in Home Header -->
-          <button class="theme-quick-btn" onclick="toggleThemeQuick()" title="Đổi giao diện Sáng / Tối">
-            <!-- Populated by JS -->
-          </button>
+
+          <!-- Model Switcher Selector -->
+          <div class="model-selector-wrap">
+            <div class="model-tabs">
+              <button class="model-tab active tab-vieneu" onclick="selectModel('vieneu')">
+                <span>⚡ VieNeu GPU</span>
+              </button>
+              <button class="model-tab tab-free" onclick="selectModel('free')">
+                <span>☁️ Miễn Phí (Edge)</span>
+              </button>
+              <button class="model-tab tab-azure" onclick="selectModel('azure')">
+                <span>💎 Azure Cloud</span>
+              </button>
+            </div>
+            <div id="modelDescText" class="model-desc-pill">
+              <span>● VieNeu Local: Giọng tự nhiên AI · Cần 60s nạp GPU</span>
+            </div>
+          </div>
+
+          <!-- URL Input Box -->
+          <div class="paste-container">
+            <div class="paste-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-tertiary)"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+              <input type="text" id="youtubeInput" class="paste-input" placeholder="Dán link YouTube tại đây..." value="https://youtube.com/watch?v=nzHY-muy2Mw">
+              <button class="paste-btn" onclick="handleLaunchFromHome()">
+                <span>Dán & Phát</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Voice Chips (Dynamic by Model) -->
+          <div class="chip-scroll" id="voiceChipsContainer">
+            <!-- Rendered by JS based on selected model -->
+          </div>
+
+          <!-- Feed & Swipe to Delete -->
+          <div class="feed-section">
+            <div class="feed-heading">
+              <span>Gần Đây & Bộ Nhớ Cache</span>
+              <span id="feedCacheSizeBadge" style="font-size: 10px; color: var(--accent-teal)">143 files đệm</span>
+            </div>
+
+            <!-- Undo Toast Pinned at Top of Feed -->
+            <div id="undoToast" class="undo-toast" style="display: none;">
+              <div class="undo-toast-content">
+                <div class="undo-toast-left">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  <span id="undoToastText">Đã xoá video</span>
+                </div>
+                <button class="undo-btn" onclick="undoCardDelete()">Hoàn tác</button>
+              </div>
+              <div class="undo-progress-bar" id="undoProgressBar"></div>
+            </div>
+
+            <!-- Feed List Container -->
+            <div id="feedListContainer">
+              <!-- Card 1: VieNeu Cached (Swipeable) -->
+              <div class="feed-item-wrapper" id="feedItem-v1" data-id="v1" data-badge="cache" data-title="Why being bilingual is good for your brain | BBC Ideas">
+                <div class="feed-danger-zone" onclick="triggerCardDelete('v1')">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                  <span>Xoá</span>
+                </div>
+                <div class="media-card" onclick="handleCardClick('cached')">
+                  <div class="card-thumb">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300" alt="thumb">
+                    <div class="card-badge badge-cache">⚡ 0s Chờ</div>
+                  </div>
+                  <div class="card-info">
+                    <div class="card-title">Why being bilingual is good for your brain | BBC Ideas</div>
+                    <div class="card-meta">5:12 · VieNeu Anh Khôi · Đã nạp cache</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 2: Free Cloud Video -->
+              <div class="feed-item-wrapper" id="feedItem-v2" data-id="v2" data-badge="cloud" data-title="How Quantum Computers Actually Work | Veritasium">
+                <div class="feed-danger-zone" onclick="triggerCardDelete('v2')">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                  <span>Xoá</span>
+                </div>
+                <div class="media-card" onclick="handleCardClick('cloud')">
+                  <div class="card-thumb">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300" alt="thumb">
+                    <div class="card-badge badge-cloud">☁️ Nhanh</div>
+                  </div>
+                  <div class="card-info">
+                    <div class="card-title">How Quantum Computers Actually Work | Veritasium</div>
+                    <div class="card-meta">14:20 · Miễn phí Hoài My · Phát tức thì</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 3: Uncached VieNeu Video -->
+              <div class="feed-item-wrapper" id="feedItem-v3" data-id="v3" data-badge="wait" data-title="The Simple Japanese Habit That Changes Everything">
+                <div class="feed-danger-zone" onclick="triggerCardDelete('v3')">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                  <span>Xoá</span>
+                </div>
+                <div class="media-card" onclick="handleCardClick('uncached')">
+                  <div class="card-thumb">
+                    <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=300" alt="thumb">
+                    <div class="card-badge badge-wait">60s Nạp</div>
+                  </div>
+                  <div class="card-info">
+                    <div class="card-title">The Simple Japanese Habit That Changes Everything</div>
+                    <div class="card-meta">8:45 · VieNeu GPU · Video mới</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State Container -->
+            <div id="feedEmptyState" class="feed-empty-state" style="display: none;">
+              <div class="empty-state-icon">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+              </div>
+              <div class="empty-state-title">Chưa có video nào</div>
+              <div class="empty-state-sub">Dán link YouTube ở trên để bắt đầu lồng tiếng</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── TABLET & DESKTOP HOME STAGE (>= 768px) ─── -->
+        <div class="tablet-home-stage">
+          <!-- Expanded Video Preview Card (768px – 1279px) -->
+          <div class="expanded-preview-card" id="tabletExpandedCard">
+            <div style="position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; background: #000;">
+              <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800" alt="Video Preview" style="width: 100%; height: 100%; object-fit: cover;">
+              <div class="card-badge badge-cache" style="position: absolute; top: 12px; left: 12px;">⚡ 0s Chờ (Đã Nạp Cache)</div>
+              <div style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.75); color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; backdrop-filter: blur(4px);">1080p AI Dub · 5:12</div>
+            </div>
+            <div style="padding: 20px;">
+              <div style="display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                <span class="server-status-dot vieneu" style="font-size: 11px;">GTX 1660 SUPER</span>
+                <span style="font-size: 11px; color: var(--accent-primary); font-weight: 600; padding: 2px 8px; background: rgba(99,102,241,0.12); border-radius: 12px;">Giọng: Anh Khôi</span>
+                <span style="font-size: 11px; color: var(--text-tertiary); padding: 2px 8px;">Song ngữ song song</span>
+              </div>
+              <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; line-height: 1.4;">Why being bilingual is good for your brain | BBC Ideas</h3>
+              <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+                Phân tích khoa học thần kinh về cách não bộ xử lý đa ngôn ngữ, tăng cường khả năng tập trung và làm chậm quá trình lão hóa nhận thức. Đã hoàn tất bản dịch và tổng hợp audio tiếng Việt chất lượng cao.
+              </p>
+              <button class="paste-btn" style="width: 100%; height: 48px; font-size: 14px; font-weight: 700; border-radius: 12px;" onclick="switchScreen('screen-player')">
+                <span>▶ Phát Ngay (VieNeu 1080p)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Desktop 2-Column History Grid (1280px+) -->
+          <div class="desktop-history-grid" id="desktopHistoryGrid" style="display: none;">
+            <div class="desktop-history-card" onclick="handleCardClick('cached')">
+              <img class="desktop-history-thumb" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300" alt="thumb">
+              <div>
+                <div class="card-badge badge-cache" style="margin-bottom: 6px;">⚡ 0s Chờ</div>
+                <div class="desktop-history-title">Why being bilingual is good for your brain | BBC Ideas</div>
+                <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 6px;">5:12 · VieNeu Anh Khôi · Đã nạp cache</div>
+              </div>
+            </div>
+            <div class="desktop-history-card" onclick="handleCardClick('cloud')">
+              <img class="desktop-history-thumb" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300" alt="thumb">
+              <div>
+                <div class="card-badge badge-cloud" style="margin-bottom: 6px;">☁️ Nhanh</div>
+                <div class="desktop-history-title">How Quantum Computers Actually Work | Veritasium</div>
+                <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 6px;">14:20 · Miễn phí Hoài My · Phát tức thì</div>
+              </div>
+            </div>
+            <div class="desktop-history-card" onclick="handleCardClick('uncached')">
+              <img class="desktop-history-thumb" src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=300" alt="thumb">
+              <div>
+                <div class="card-badge badge-wait" style="margin-bottom: 6px;">60s Nạp</div>
+                <div class="desktop-history-title">The Simple Japanese Habit That Changes Everything</div>
+                <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 6px;">8:45 · VieNeu GPU · Video mới</div>
+              </div>
+            </div>
+            <div class="desktop-history-card" onclick="handleCardClick('cloud')">
+              <img class="desktop-history-thumb" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300" alt="thumb">
+              <div>
+                <div class="card-badge badge-cloud" style="margin-bottom: 6px;">☁️ Nhanh</div>
+                <div class="desktop-history-title">James Webb Telescope: 5 Discoveries That Broke Science</div>
+                <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 6px;">18:30 · Miễn phí Nam Minh · Phát tức thì</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <!-- Model Switcher Selector -->
-      <div class="model-selector-wrap">
-        <div class="model-tabs">
-          <button class="model-tab active tab-vieneu" onclick="selectModel('vieneu')">
-            <span>⚡ VieNeu GPU</span>
-          </button>
-          <button class="model-tab tab-free" onclick="selectModel('free')">
-            <span>☁️ Miễn Phí (Edge)</span>
-          </button>
-          <button class="model-tab tab-azure" onclick="selectModel('azure')">
-            <span>💎 Azure Cloud</span>
-          </button>
-        </div>
-        <div id="modelDescText" class="model-desc-pill">
-          <span>● VieNeu Local: Giọng tự nhiên AI · Cần 60s nạp GPU</span>
-        </div>
-      </div>
-
-      <!-- URL Input Box -->
-      <div class="paste-container">
-        <div class="paste-box">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-tertiary)"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-          <input type="text" id="youtubeInput" class="paste-input" placeholder="Dán link YouTube tại đây..." value="https://youtube.com/watch?v=nzHY-muy2Mw">
-          <button class="paste-btn" onclick="handleLaunchFromHome()">
-            <span>Dán & Phát</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Voice Chips (Dynamic by Model) -->
-      <div class="chip-scroll" id="voiceChipsContainer">
-        <!-- Rendered by JS based on selected model -->
-      </div>
-
-      <!-- ─── FEATURE 1: FEED & SWIPE-TO-DELETE ─── -->
-      <div class="feed-section">
-        <div class="feed-heading">
-          <span>Gần Đây & Bộ Nhớ Cache</span>
-          <span id="feedCacheSizeBadge" style="font-size: 10px; color: var(--accent-teal)">143 files đệm</span>
-        </div>
-
-        <!-- Undo Toast Pinned at Top of Feed -->
-        <div id="undoToast" class="undo-toast" style="display: none;">
-          <div class="undo-toast-content">
-            <div class="undo-toast-left">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-              <span id="undoToastText">Đã xoá video</span>
-            </div>
-            <button class="undo-btn" onclick="undoCardDelete()">Hoàn tác</button>
-          </div>
-          <div class="undo-progress-bar" id="undoProgressBar"></div>
-        </div>
-
-        <!-- Feed List Container -->
-        <div id="feedListContainer">
-          <!-- Card 1: VieNeu Cached (Swipeable) -->
-          <div class="feed-item-wrapper" id="feedItem-v1" data-id="v1" data-badge="cache" data-title="Why being bilingual is good for your brain | BBC Ideas">
-            <div class="feed-danger-zone" onclick="triggerCardDelete('v1')">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
-              <span>Xoá</span>
-            </div>
-            <div class="media-card" onclick="handleCardClick('cached')">
-              <div class="card-thumb">
-                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300" alt="thumb">
-                <div class="card-badge badge-cache">⚡ 0s Chờ</div>
-              </div>
-              <div class="card-info">
-                <div class="card-title">Why being bilingual is good for your brain | BBC Ideas</div>
-                <div class="card-meta">5:12 · VieNeu Anh Khôi · Đã nạp cache</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 2: Free Cloud Video (Non-deletable cloud cache) -->
-          <div class="feed-item-wrapper" id="feedItem-v2" data-id="v2" data-badge="cloud" data-title="How Quantum Computers Actually Work | Veritasium">
-            <div class="feed-danger-zone" onclick="triggerCardDelete('v2')">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
-              <span>Xoá</span>
-            </div>
-            <div class="media-card" onclick="handleCardClick('cloud')">
-              <div class="card-thumb">
-                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300" alt="thumb">
-                <div class="card-badge badge-cloud">☁️ Nhanh</div>
-              </div>
-              <div class="card-info">
-                <div class="card-title">How Quantum Computers Actually Work | Veritasium</div>
-                <div class="card-meta">14:20 · Miễn phí Hoài My · Phát tức thì</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 3: Uncached VieNeu Video (Swipeable) -->
-          <div class="feed-item-wrapper" id="feedItem-v3" data-id="v3" data-badge="wait" data-title="The Simple Japanese Habit That Changes Everything">
-            <div class="feed-danger-zone" onclick="triggerCardDelete('v3')">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
-              <span>Xoá</span>
-            </div>
-            <div class="media-card" onclick="handleCardClick('uncached')">
-              <div class="card-thumb">
-                <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=300" alt="thumb">
-                <div class="card-badge badge-wait">60s Nạp</div>
-              </div>
-              <div class="card-info">
-                <div class="card-title">The Simple Japanese Habit That Changes Everything</div>
-                <div class="card-meta">8:45 · VieNeu GPU · Video mới</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Empty State Container (Hidden when items exist) -->
-        <div id="feedEmptyState" class="feed-empty-state" style="display: none;">
-          <div class="empty-state-icon">
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
-          </div>
-          <div class="empty-state-title">Chưa có video nào</div>
-          <div class="empty-state-sub">Dán link YouTube ở trên để bắt đầu lồng tiếng</div>
-        </div>
-      </div>
-    </div>
 
     <!-- ─── SCREEN 2: 60S COUNTDOWN / WARMUP ─── -->
     <div id="screen-warmup" class="screen-view">
@@ -2216,85 +2896,90 @@
 
     <!-- ─── SCREEN 3: PLAYER SCREEN ─── -->
     <div id="screen-player" class="screen-view">
-      <!-- 16:9 Video Box -->
-      <div class="player-video-box">
-        <div class="mock-video-overlay" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800');">
-          <div class="mock-video-tag" id="playerTagBadge" style="color: var(--accent-teal);">● VieNeu: Anh Khôi</div>
-        </div>
-        <!-- Floating CC Pill (When Subtitles are Off, tap to restore) -->
-        <div class="floating-cc-pill" id="floatingCcPill" onclick="setSubtitleMode('bilingual')" style="display: none;">
-          <span id="floatingCcText">CC Tắt</span>
-        </div>
-      </div>
-
-      <!-- ─── FEATURE 2: SUBTITLE HUD WITH 3-WAY SELECTOR ─── -->
-      <div class="subtitle-hud" id="subtitleHud">
-        <div class="subtitle-mode-switch">
-          <button class="sub-mode-btn active" id="hudSubBilingual" onclick="setSubtitleMode('bilingual')" title="Song ngữ">双</button>
-          <button class="sub-mode-btn" id="hudSubViOnly" onclick="setSubtitleMode('vi_only')" title="Chỉ dịch">VI</button>
-          <button class="sub-mode-btn" id="hudSubOff" onclick="setSubtitleMode('off')" title="Tắt phụ đề">CC</button>
-        </div>
-        <div class="sub-line-orig" id="subLineOrig">Speaking more than one language has obvious practical benefits...</div>
-        <div class="sub-line-vi" id="subLineVi">Biết nhiều hơn một ngôn ngữ đem lại những lợi ích thực tế vô cùng rõ rệt...</div>
-      </div>
-
-      <!-- Dual Audio Console -->
-      <div class="audio-dock">
-        <div class="audio-slider-row">
-          <div class="slider-label">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
-            <span>Gốc</span>
+      <div class="player-stage-container">
+        <!-- 16:9 Video Box -->
+        <div class="player-video-box">
+          <div class="mock-video-overlay" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800');">
+            <div class="mock-video-tag" id="playerTagBadge" style="color: var(--accent-teal);">● VieNeu: Anh Khôi</div>
           </div>
-          <div class="slider-track">
-            <div class="slider-fill goc"></div>
+          <!-- Floating CC Pill (When Subtitles are Off, tap to restore) -->
+          <div class="floating-cc-pill" id="floatingCcPill" onclick="setSubtitleMode('bilingual')" style="display: none;">
+            <span id="floatingCcText">CC Tắt</span>
           </div>
-          <div class="slider-val">20%</div>
         </div>
 
-        <div class="audio-slider-row">
-          <div class="slider-label" style="color: var(--text-primary)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary)"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-            <span>Lồng tiếng</span>
+        <!-- ─── FEATURE 2: SUBTITLE HUD WITH 3-WAY SELECTOR ─── -->
+        <div class="subtitle-hud" id="subtitleHud">
+          <div class="subtitle-mode-switch">
+            <button class="sub-mode-btn active" id="hudSubBilingual" onclick="setSubtitleMode('bilingual')" title="Song ngữ">双</button>
+            <button class="sub-mode-btn" id="hudSubViOnly" onclick="setSubtitleMode('vi_only')" title="Chỉ dịch">VI</button>
+            <button class="sub-mode-btn" id="hudSubOff" onclick="setSubtitleMode('off')" title="Tắt phụ đề">CC</button>
           </div>
-          <div class="slider-track">
-            <div class="slider-fill dub"></div>
-          </div>
-          <div class="slider-val" style="color: var(--text-primary)">90%</div>
-        </div>
-      </div>
-
-      <!-- Playback Transport Controls -->
-      <div class="transport-dock">
-        <div class="seekbar-row">
-          <span class="time-stamp">01:42</span>
-          <div class="seekbar-track">
-            <div class="seekbar-buffered"></div>
-            <div class="seekbar-played"></div>
-            <div class="seekbar-thumb"></div>
-          </div>
-          <span class="time-stamp">-03:30</span>
+          <div class="sub-line-orig" id="subLineOrig">Speaking more than one language has obvious practical benefits...</div>
+          <div class="sub-line-vi" id="subLineVi">Biết nhiều hơn một ngôn ngữ đem lại những lợi ích thực tế vô cùng rõ rệt...</div>
         </div>
 
-        <div class="buttons-row">
-          <button class="btn-skip">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
-            <span>-10s</span>
-          </button>
+        <!-- Player Desktop Split Row (Audio Console + Playback Transport) -->
+        <div class="player-desktop-split">
+          <!-- Dual Audio Console -->
+          <div class="audio-dock">
+            <div class="audio-slider-row">
+              <div class="slider-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+                <span>Gốc</span>
+              </div>
+              <div class="slider-track">
+                <div class="slider-fill goc"></div>
+              </div>
+              <div class="slider-val">20%</div>
+            </div>
 
-          <button class="btn-play-pause">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-          </button>
+            <div class="audio-slider-row">
+              <div class="slider-label" style="color: var(--text-primary)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary)"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                <span>Lồng tiếng</span>
+              </div>
+              <div class="slider-track">
+                <div class="slider-fill dub"></div>
+              </div>
+              <div class="slider-val" style="color: var(--text-primary)">90%</div>
+            </div>
+          </div>
 
-          <button class="btn-skip">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
-            <span>+10s</span>
-          </button>
+          <!-- Playback Transport Controls -->
+          <div class="transport-dock">
+            <div class="seekbar-row">
+              <span class="time-stamp">01:42</span>
+              <div class="seekbar-track">
+                <div class="seekbar-buffered"></div>
+                <div class="seekbar-played"></div>
+                <div class="seekbar-thumb"></div>
+              </div>
+              <span class="time-stamp">-03:30</span>
+            </div>
+
+            <div class="buttons-row">
+              <button class="btn-skip">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
+                <span>-10s</span>
+              </button>
+
+              <button class="btn-play-pause">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+              </button>
+
+              <button class="btn-skip">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
+                <span>+10s</span>
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- In-player Voice Switcher Row -->
-      <div class="chip-scroll" style="padding: 10px 20px;" id="playerVoiceChips">
-        <!-- Rendered by JS -->
+        <!-- In-player Voice Switcher Row -->
+        <div class="chip-scroll" style="padding: 10px 20px;" id="playerVoiceChips">
+          <!-- Rendered by JS -->
+        </div>
       </div>
     </div>
 
@@ -2303,140 +2988,148 @@
       <div class="settings-wrapper">
         <h2 class="settings-title">Cài Đặt Hệ Thống</h2>
 
-        <!-- Group: Appearance / Theme -->
-        <div class="settings-group">
-          <div class="group-label">Giao Diện & Màu Sắc</div>
+        <div class="settings-grid-split">
+          <!-- Left Column on Tablet / Desktop -->
+          <div class="settings-col">
+            <!-- Group 0: Model Engine Architecture -->
+            <div class="settings-group">
+              <div class="group-label">Bộ Máy Lồng Tiếng (TTS Engine)</div>
 
-          <div class="settings-row">
-            <div>
-              <div class="row-text-title">Chế độ hiển thị</div>
-              <div class="row-text-desc" id="themeStatusDesc">Tự động theo hệ điều hành</div>
-            </div>
-            <div class="segmented-control">
-              <button class="segment-opt" id="themeOptDark" onclick="setThemeMode('dark')">🌙 Tối</button>
-              <button class="segment-opt active" id="themeOptAuto" onclick="setThemeMode('auto')">⚙️ Tự động</button>
-              <button class="segment-opt" id="themeOptLight" onclick="setThemeMode('light')">☀️ Sáng</button>
-            </div>
-          </div>
-        </div>
+              <!-- Option 1: VieNeu -->
+              <div class="model-card-opt active" id="settingOptVieNeu" onclick="selectModelFromSettings('vieneu')">
+                <div class="model-card-left">
+                  <div class="model-card-icon" style="background: rgba(99, 102, 241, 0.2); color: var(--accent-primary)">⚡</div>
+                  <div>
+                    <div class="model-card-name">VieNeu AI (Local GPU)</div>
+                    <div class="model-card-sub">Khuyên dùng · Giọng tự nhiên nhất · GTX 1660 SUPER</div>
+                  </div>
+                </div>
+                <div class="model-radio-circle"></div>
+              </div>
 
-        <!-- Group 0: Model Engine Architecture -->
-        <div class="settings-group">
-          <div class="group-label">Bộ Máy Lồng Tiếng (TTS Engine)</div>
+              <!-- Option 2: Free Edge -->
+              <div class="model-card-opt" id="settingOptFree" onclick="selectModelFromSettings('free')">
+                <div class="model-card-left">
+                  <div class="model-card-icon" style="background: rgba(56, 189, 248, 0.2); color: #38BDF8">☁️</div>
+                  <div>
+                    <div class="model-card-name">Miễn Phí (Edge Cloud)</div>
+                    <div class="model-card-sub">100% Miễn phí · Không tốn GPU · Phát tức thì</div>
+                  </div>
+                </div>
+                <div class="model-radio-circle"></div>
+              </div>
 
-          <!-- Option 1: VieNeu -->
-          <div class="model-card-opt active" id="settingOptVieNeu" onclick="selectModelFromSettings('vieneu')">
-            <div class="model-card-left">
-              <div class="model-card-icon" style="background: rgba(99, 102, 241, 0.2); color: var(--accent-primary)">⚡</div>
-              <div>
-                <div class="model-card-name">VieNeu AI (Local GPU)</div>
-                <div class="model-card-sub">Khuyên dùng · Giọng tự nhiên nhất · GTX 1660 SUPER</div>
+              <!-- Option 3: Azure Cloud -->
+              <div class="model-card-opt" id="settingOptAzure" onclick="selectModelFromSettings('azure')">
+                <div class="model-card-left">
+                  <div class="model-card-icon" style="background: rgba(167, 139, 250, 0.2); color: #A78BFA">💎</div>
+                  <div>
+                    <div class="model-card-name">Azure TTS (Microsoft Cloud)</div>
+                    <div class="model-card-sub">Giọng chuẩn phòng thu Neural · Độ ổn định cao</div>
+                  </div>
+                </div>
+                <div class="model-radio-circle"></div>
+              </div>
+
+              <!-- Azure Specific Configuration Form -->
+              <div id="azureConfigSection" class="azure-config-panel" style="display: none;">
+                <div class="row-text-title" style="margin-bottom: 4px;">Cấu hình Microsoft Azure Speech</div>
+                <input type="password" class="input-field" placeholder="Nhập Azure API Key..." value="••••••••••••••••••••••••">
+                <input type="text" class="input-field" placeholder="Vùng (Region), ví dụ: southeastasia" value="southeastasia">
+                <button class="btn-action" style="margin-top: 8px; font-size: 11.5px; padding: 7px;">
+                  <span>Kiểm tra kết nối Azure (Ping: 42ms OK)</span>
+                </button>
               </div>
             </div>
-            <div class="model-radio-circle"></div>
+
+            <!-- Group 3: Server Connection -->
+            <div class="settings-group">
+              <div class="group-label">Kết Nối Máy Chủ PC</div>
+              
+              <div class="settings-row">
+                <div>
+                  <div class="row-text-title">Địa chỉ IP Máy Tính</div>
+                  <div class="row-text-desc">http://192.168.1.15:3000</div>
+                </div>
+                <span style="font-size: 11px; color: var(--accent-teal); font-weight: 700;">12ms</span>
+              </div>
+
+              <button class="btn-action" style="background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); border-color: rgba(99, 102, 241, 0.3)">
+                <span>📷 Quét mã QR từ TransDuck Studio</span>
+              </button>
+            </div>
           </div>
 
-          <!-- Option 2: Free Edge -->
-          <div class="model-card-opt" id="settingOptFree" onclick="selectModelFromSettings('free')">
-            <div class="model-card-left">
-              <div class="model-card-icon" style="background: rgba(56, 189, 248, 0.2); color: #38BDF8">☁️</div>
-              <div>
-                <div class="model-card-name">Miễn Phí (Edge Cloud)</div>
-                <div class="model-card-sub">100% Miễn phí · Không tốn GPU · Phát tức thì</div>
+          <!-- Right Column on Tablet / Desktop -->
+          <div class="settings-col">
+            <!-- Group: Appearance / Theme -->
+            <div class="settings-group">
+              <div class="group-label">Giao Diện & Màu Sắc</div>
+
+              <div class="settings-row">
+                <div>
+                  <div class="row-text-title">Chế độ hiển thị</div>
+                  <div class="row-text-desc" id="themeStatusDesc">Tự động theo hệ điều hành</div>
+                </div>
+                <div class="segmented-control">
+                  <button class="segment-opt" id="themeOptDark" onclick="setThemeMode('dark')">🌙 Tối</button>
+                  <button class="segment-opt active" id="themeOptAuto" onclick="setThemeMode('auto')">⚙️ Tự động</button>
+                  <button class="segment-opt" id="themeOptLight" onclick="setThemeMode('light')">☀️ Sáng</button>
+                </div>
               </div>
             </div>
-            <div class="model-radio-circle"></div>
-          </div>
 
-          <!-- Option 3: Azure Cloud -->
-          <div class="model-card-opt" id="settingOptAzure" onclick="selectModelFromSettings('azure')">
-            <div class="model-card-left">
-              <div class="model-card-icon" style="background: rgba(167, 139, 250, 0.2); color: #A78BFA">💎</div>
-              <div>
-                <div class="model-card-name">Azure TTS (Microsoft Cloud)</div>
-                <div class="model-card-sub">Giọng chuẩn phòng thu Neural · Độ ổn định cao</div>
+            <!-- Group 1: Preferences & Subtitle Settings Sync -->
+            <div class="settings-group">
+              <div class="group-label">Trải Nghiệm & Hiển Thị</div>
+              
+              <div class="settings-row">
+                <div>
+                  <div class="row-text-title">Giọng đọc ưu tiên</div>
+                  <div class="row-text-desc" id="prefVoiceDesc">Anh Khôi — Nam · Bắc · Truyền cảm</div>
+                </div>
+                <button class="segment-opt active" onclick="switchScreen('screen-home')">Đổi</button>
+              </div>
+
+              <div class="settings-row">
+                <div>
+                  <div class="row-text-title">Chế độ phụ đề</div>
+                  <div class="row-text-desc" id="settingSubDesc">Hiển thị song ngữ gốc và dịch</div>
+                </div>
+                <div class="segmented-control">
+                  <button class="segment-opt active" id="settingSubBilingual" onclick="setSubtitleMode('bilingual')">Song ngữ</button>
+                  <button class="segment-opt" id="settingSubViOnly" onclick="setSubtitleMode('vi_only')">Chỉ dịch</button>
+                  <button class="segment-opt" id="settingSubOff" onclick="setSubtitleMode('off')">Tắt</button>
+                </div>
               </div>
             </div>
-            <div class="model-radio-circle"></div>
-          </div>
 
-          <!-- Azure Specific Configuration Form -->
-          <div id="azureConfigSection" class="azure-config-panel" style="display: none;">
-            <div class="row-text-title" style="margin-bottom: 4px;">Cấu hình Microsoft Azure Speech</div>
-            <input type="password" class="input-field" placeholder="Nhập Azure API Key..." value="••••••••••••••••••••••••">
-            <input type="text" class="input-field" placeholder="Vùng (Region), ví dụ: southeastasia" value="southeastasia">
-            <button class="btn-action" style="margin-top: 8px; font-size: 11.5px; padding: 7px;">
-              <span>Kiểm tra kết nối Azure (Ping: 42ms OK)</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Group 1: Preferences & Subtitle Settings Sync -->
-        <div class="settings-group">
-          <div class="group-label">Trải Nghiệm & Hiển Thị</div>
-          
-          <div class="settings-row">
-            <div>
-              <div class="row-text-title">Giọng đọc ưu tiên</div>
-              <div class="row-text-desc" id="prefVoiceDesc">Anh Khôi — Nam · Bắc · Truyền cảm</div>
-            </div>
-            <button class="segment-opt active" onclick="switchScreen('screen-home')">Đổi</button>
-          </div>
-
-          <div class="settings-row">
-            <div>
-              <div class="row-text-title">Chế độ phụ đề</div>
-              <div class="row-text-desc" id="settingSubDesc">Hiển thị song ngữ gốc và dịch</div>
-            </div>
-            <div class="segmented-control">
-              <button class="segment-opt active" id="settingSubBilingual" onclick="setSubtitleMode('bilingual')">Song ngữ</button>
-              <button class="segment-opt" id="settingSubViOnly" onclick="setSubtitleMode('vi_only')">Chỉ dịch</button>
-              <button class="segment-opt" id="settingSubOff" onclick="setSubtitleMode('off')">Tắt</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- ─── FEATURE 3: CACHE MANAGEMENT ─── -->
-        <div class="settings-group">
-          <div class="group-label">Bộ Nhớ Đệm Âm Thanh (PC)</div>
-          
-          <div class="settings-row">
-            <div>
-              <div class="row-text-title">Dung lượng Cache đã lưu</div>
-              <div class="row-text-desc" id="cacheMetricDesc">
-                <span id="cacheFilesCount">143 files</span> · <span id="cacheSizeText">42.5 MB</span> · <span id="cacheOldestText">Cũ nhất: 12 ngày trước</span>
+            <!-- ─── FEATURE 3: CACHE MANAGEMENT ─── -->
+            <div class="settings-group">
+              <div class="group-label">Bộ Nhớ Đệm Âm Thanh (PC)</div>
+              
+              <div class="settings-row">
+                <div>
+                  <div class="row-text-title">Dung lượng Cache đã lưu</div>
+                  <div class="row-text-desc" id="cacheMetricDesc">
+                    <span id="cacheFilesCount">143 files</span> · <span id="cacheSizeText">42.5 MB</span> · <span id="cacheOldestText">Cũ nhất: 12 ngày trước</span>
+                  </div>
+                </div>
               </div>
+
+              <!-- Contextual Button Group -->
+              <div id="cacheBtnContainer">
+                <button class="btn-action" id="btnClearTempCache" onclick="handleClearTempCache()">
+                  <span>🧹 Xoá cache tạm · Giữ audio đã lưu</span>
+                </button>
+                <button class="btn-action btn-danger" id="btnOpenClearAllSheet" onclick="openClearAllSheet()">
+                  <span>🗑️ Xoá toàn bộ · Xoá hết audio đã lưu</span>
+                </button>
+              </div>
+
+              <div id="cacheToastMsg" class="cache-toast-msg" style="display: none;"></div>
             </div>
           </div>
-
-          <!-- Contextual Button Group -->
-          <div id="cacheBtnContainer">
-            <button class="btn-action" id="btnClearTempCache" onclick="handleClearTempCache()">
-              <span>🧹 Xoá cache tạm · Giữ audio đã lưu</span>
-            </button>
-            <button class="btn-action btn-danger" id="btnOpenClearAllSheet" onclick="openClearAllSheet()">
-              <span>🗑️ Xoá toàn bộ · Xoá hết audio đã lưu</span>
-            </button>
-          </div>
-
-          <div id="cacheToastMsg" class="cache-toast-msg" style="display: none;"></div>
-        </div>
-
-        <!-- Group 3: Server Connection -->
-        <div class="settings-group">
-          <div class="group-label">Kết Nối Máy Chủ PC</div>
-          
-          <div class="settings-row">
-            <div>
-              <div class="row-text-title">Địa chỉ IP Máy Tính</div>
-              <div class="row-text-desc">http://192.168.1.15:3000</div>
-            </div>
-            <span style="font-size: 11px; color: var(--accent-teal); font-weight: 700;">12ms</span>
-          </div>
-
-          <button class="btn-action" style="background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); border-color: rgba(99, 102, 241, 0.3)">
-            <span>📷 Quét mã QR từ TransDuck Studio</span>
-          </button>
         </div>
       </div>
     </div>
@@ -2470,6 +3163,8 @@
         <button class="sheet-btn sheet-btn-cancel" onclick="closeClearAllSheet()">Huỷ</button>
       </div>
     </div>
+
+    </main>
 
   </div>
 
@@ -2840,11 +3535,13 @@
       const sizeEl = document.getElementById('cacheSizeText');
       const oldestEl = document.getElementById('cacheOldestText');
       const badgeEl = document.getElementById('feedCacheSizeBadge');
+      const sbBadgeEl = document.getElementById('sidebarCacheBadge');
 
       if (filesEl) filesEl.textContent = `${state.cache.files} files`;
       if (sizeEl) sizeEl.textContent = `${state.cache.sizeMB.toFixed(1)} MB`;
       if (oldestEl) oldestEl.textContent = (state.cache.files > 0) ? `Cũ nhất: ${state.cache.oldestDays} ngày trước` : 'Trống';
       if (badgeEl) badgeEl.textContent = `${state.cache.files} files đệm`;
+      if (sbBadgeEl) sbBadgeEl.textContent = `${state.cache.files} files`;
     }
 
     function handleClearTempCache() {
@@ -2952,9 +3649,17 @@
         tab.classList.toggle('active', tab.getAttribute('onclick').includes(modelKey));
       });
 
+      // Sync Sidebar Model Buttons
+      const sbVieNeu = document.getElementById('sbModelVieNeu');
+      const sbFree = document.getElementById('sbModelFree');
+      const sbAzure = document.getElementById('sbModelAzure');
+      if (sbVieNeu) sbVieNeu.classList.toggle('active', modelKey === 'vieneu');
+      if (sbFree) sbFree.classList.toggle('active', modelKey === 'free');
+      if (sbAzure) sbAzure.classList.toggle('active', modelKey === 'azure');
+
       const statusIndicator = document.getElementById('statusBarIndicator');
       const statusText = document.getElementById('statusBarText');
-      statusIndicator.className = 'server-status-dot ' + modelKey;
+      if (statusIndicator) statusIndicator.className = 'server-status-dot ' + modelKey;
 
       const descMap = {
         vieneu: '● VieNeu Local: Giọng tự nhiên AI · Cần 60s nạp GPU',
@@ -2967,8 +3672,9 @@
         azure: 'Azure Speech Pro'
       };
       
-      document.getElementById('modelDescText').innerHTML = `<span>${descMap[modelKey]}</span>`;
-      statusText.textContent = statusMap[modelKey];
+      const modelDesc = document.getElementById('modelDescText');
+      if (modelDesc) modelDesc.innerHTML = `<span>${descMap[modelKey]}</span>`;
+      if (statusText) statusText.textContent = statusMap[modelKey];
 
       state.activeVoice = state.voicesByModel[modelKey][0].name;
 
@@ -2979,9 +3685,9 @@
 
     function selectModelFromSettings(modelKey) {
       document.querySelectorAll('.model-card-opt').forEach(opt => opt.classList.remove('active'));
-      if (modelKey === 'vieneu') document.getElementById('settingOptVieNeu').classList.add('active');
-      if (modelKey === 'free') document.getElementById('settingOptFree').classList.add('active');
-      if (modelKey === 'azure') document.getElementById('settingOptAzure').classList.add('active');
+      if (modelKey === 'vieneu') document.getElementById('settingOptVieNeu')?.classList.add('active');
+      if (modelKey === 'free') document.getElementById('settingOptFree')?.classList.add('active');
+      if (modelKey === 'azure') document.getElementById('settingOptAzure')?.classList.add('active');
 
       const azureSec = document.getElementById('azureConfigSection');
       if (azureSec) azureSec.style.display = modelKey === 'azure' ? 'block' : 'none';
@@ -3007,6 +3713,7 @@
     function renderVoiceChips() {
       const container = document.getElementById('voiceChipsContainer');
       const playerChips = document.getElementById('playerVoiceChips');
+      const sbVoiceList = document.getElementById('sidebarVoiceList');
       const voices = state.voicesByModel[state.model];
 
       if (container) {
@@ -3021,6 +3728,15 @@
         playerChips.innerHTML = voices.map(v => `
           <div class="voice-chip ${v.name === state.activeVoice ? 'active' : ''}" onclick="pickVoice('${v.name}')">
             <span>${v.icon} ${v.name}</span>
+          </div>
+        `).join('');
+      }
+
+      if (sbVoiceList) {
+        sbVoiceList.innerHTML = voices.map(v => `
+          <div class="sidebar-voice-item ${v.name === state.activeVoice ? 'active' : ''}" onclick="pickVoice('${v.name}')">
+            <span>${v.icon}</span>
+            <span>${v.name}</span>
           </div>
         `).join('');
       }
@@ -3076,6 +3792,15 @@
       triggerQuickWarmup('free');
     }
 
+    function handleSidebarLaunch() {
+      const input = document.getElementById('sidebarYoutubeInput');
+      if (input && input.value) {
+        const homeInput = document.getElementById('youtubeInput');
+        if (homeInput) homeInput.value = input.value;
+      }
+      handleLaunchFromHome();
+    }
+
     // Screen Switching Engine
     function switchScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
@@ -3083,13 +3808,28 @@
       if (target) target.classList.add('active');
 
       document.querySelectorAll('.screen-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('onclick').includes(screenId));
+        const onclick = btn.getAttribute('onclick');
+        if (onclick) btn.classList.toggle('active', onclick.includes(screenId));
       });
 
       document.querySelectorAll('.nav-item').forEach(nav => {
         const onclick = nav.getAttribute('onclick');
         if (onclick) {
           nav.classList.toggle('active', onclick.includes(screenId));
+        }
+      });
+
+      document.querySelectorAll('.rail-nav-item').forEach(rail => {
+        const onclick = rail.getAttribute('onclick');
+        if (onclick) {
+          rail.classList.toggle('active', onclick.includes(screenId));
+        }
+      });
+
+      document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+        const onclick = item.getAttribute('onclick');
+        if (onclick) {
+          item.classList.toggle('active', onclick.includes(screenId));
         }
       });
 
@@ -3185,6 +3925,47 @@
           }, 300);
         }
       }, 300);
+    }
+
+    // ─── RESPONSIVE LAYOUT ENGINE & REVIEW MODE ───
+    const layoutBreakpoints = { tablet: 768, tabletLg: 1024, desktop: 1280 };
+
+    function getLayoutClass(width) {
+      if (width >= layoutBreakpoints.desktop) return 'layout-desktop';
+      if (width >= layoutBreakpoints.tabletLg) return 'layout-tablet-lg';
+      if (width >= layoutBreakpoints.tablet) return 'layout-tablet';
+      return 'layout-phone';
+    }
+
+    function applyLayoutClass() {
+      const width = window.innerWidth;
+      const cls = getLayoutClass(width);
+      if (document.body.dataset.layout !== cls) {
+        document.body.dataset.layout = cls;
+      }
+    }
+
+    applyLayoutClass();
+
+    const appShell = document.querySelector('.app-shell') || document.querySelector('.mobile-frame');
+    if (window.ResizeObserver && appShell) {
+      const ro = new ResizeObserver(entries => {
+        if (!entries || !entries[0]) return;
+        const width = entries[0].contentRect.width;
+        const cls = getLayoutClass(width);
+        if (document.body.dataset.layout !== cls) {
+          document.body.dataset.layout = cls;
+        }
+      });
+      ro.observe(appShell);
+    } else {
+      window.addEventListener('resize', applyLayoutClass, { passive: true });
+    }
+
+    // Review Mode: ?review=1 forces top review navigation bar visibility
+    if (new URLSearchParams(window.location.search).get('review') === '1') {
+      document.querySelectorAll('.screen-switcher').forEach(s => s.classList.add('review-active'));
+      document.body.classList.add('review-mode');
     }
 
     // Initialize Components

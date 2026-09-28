@@ -856,10 +856,33 @@ The three new v1.2.0 features do not exist in isolation; they are deeply intertw
 
 ---
 
-## 10. WHAT THE V1.2.0 SPEC LOOKS LIKE AFTER THESE LAND
+## 11. MULTI-DEVICE RESPONSIVE ARCHITECTURE (TABLET & DESKTOP SPLIT VIEWPORT)
 
-With the integration of **Swipe-to-Delete History**, the **Trimodal Subtitle HUD Architecture**, and **Tiered Audio Cache Management**, the VieNeu Mobile Player matures from a functional PWA prototype into an uncompromising, platform-grade media companion. The interface now delivers the tactile feedback of native iOS/Android software through deliberate touch physics, reversible non-blocking undo flows, and hardware-truthful telemetry. By treating both Dark Cinema and Light Editorial surfaces as equal first-class citizens, v1.2.0 establishes an inevitable, calm, and trustworthy interaction standard that lets the user command heavy local PC AI inference with the featherweight grace of a consumer streaming app.
+While VieNeu Mobile Player originated as a mobile-first PWA for handheld iOS and Android devices, v1.2.0 introduces an adaptive responsive framework allowing the application to fluidly scale from phone screens (360px–480px) to foldable devices, iPads / Android tablets (768px–1024px), and large desktop displays (1280px+).
+
+### 11.1 Breakpoint Token Hierarchy
+- **Phone (`< 768px`):** Single-column stacked viewport (`.phone-home-content`), persistent pinned bottom navigation bar (`.bottom-nav`), full-width media cards with horizontal swipe gesture handlers.
+- **Tablet Portrait (`768px – 1023px`):** Two-pane layout. Left column: 280px content sidebar (`.tablet-sidebar`) with vertical model selector tabs, quick paste bar, vertical AI voice list, and history feed. Right column: Main stage (`.main-stage`) hosting expanded 16:9 preview hero cards, dual-column settings split (`.settings-grid-split`), and centered widescreen media player (`.player-stage-container`).
+- **Tablet Landscape & Desktop (`1024px – 1279px`):** Three-pane layout. Pinned 68px left icon navigation rail (`.nav-rail`) with quick theme switcher, 320px intermediate content sidebar (`.tablet-sidebar`), and fluid central stage (`.main-stage`). Bottom navigation is automatically hidden.
+- **Widescreen Desktop (`≥ 1280px`):** Expanded 340px sidebar, expanded 2-column history grid (`.desktop-history-grid`) on Home stage, and side-by-side audio dock + transport console on the Player screen (`.player-desktop-split`).
+
+### 11.2 Fluid Desktop Player Stage
+In mobile viewports, the video player stacks vertically above the dual-audio console and transport dock. In desktop/tablet viewports:
+- The video viewport is constrained to a 16:9 aspect ratio with a maximum width of 760px, maintaining visual balance without oversized pixelation.
+- The dual audio sliders (Original audio vs. AI Dubbed audio) and transport dock (Seekbar + Playback buttons) flow into a balanced 2-column flex row (`.player-desktop-split`), allowing simultaneous volume balance adjustments and seeking with zero vertical scrolling.
+
+### 11.3 Settings Grid Split
+On screens ≥ 768px, system configuration groups automatically distribute across two equal columns:
+- **Left Column:** Hardware Engine Architecture (VieNeu Local GPU vs. Edge Cloud vs. Azure Pro) and PC Server Connection Telemetry (IP & QR pairing).
+- **Right Column:** Appearance & Theme switcher, Experience & Subtitle mode sync, and Audio Cache Management telemetry with the clearing bottom sheet modal.
+
+---
+
+## 12. WHAT THE V1.2.0 SPEC LOOKS LIKE AFTER THESE LAND
+
+With the integration of **Swipe-to-Delete History**, the **Trimodal Subtitle HUD Architecture**, **Tiered Audio Cache Management**, and the **Adaptive Tablet/Desktop Shell**, VieNeu Mobile Player matures from a mobile PWA prototype into an uncompromising, universal cross-platform media suite. The interface delivers the tactile feedback of native iOS/Android gestures when held in one hand, while gracefully transforming into a professional dubbing workstation on tablets and laptops. By treating both Dark Cinema and Light Editorial surfaces as equal first-class citizens, v1.2.0 establishes an inevitable, calm, and trustworthy interaction standard that lets the user command heavy local PC AI inference with the featherweight grace of a consumer streaming app.
 
 ---
 *VieNeu Mobile Player Design System v1.2.0 — Antigravity Creative Direction.*
+
 
