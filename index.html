@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>VieNeu Mobile Player</title>
+  <meta name="theme-color" content="#0A0A0C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-canvas: #0A0A0C;
+      --bg-surface: #121216;
+      --bg-elevated: #1A1A22;
+      --bg-glass: rgba(18, 18, 22, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-active: rgba(99, 102, 241, 0.40);
+      --accent-primary: #6366F1;
+      --accent-hover: #4F46E5;
+      --accent-teal: #14B8A6;
+      --accent-azure: #0284C7;
+      --accent-amber: #F59E0B;
+      --accent-rose: #F43F5E;
+      --text-primary: #FFFFFF;
+      --text-secondary: #A1A1AA;
+      --text-tertiary: #71717A;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+      --font-main: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: #000000;
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Screen Preview Container (Mobile viewport frame) */
+    .mobile-frame {
+      width: 100%;
+      max-width: 414px;
+      height: 100vh;
+      max-height: 896px;
+      background: var(--bg-canvas);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border-subtle);
+    }
+
+    @media (min-width: 480px) {
+      .mobile-frame {
+        border-radius: 40px;
+        height: 860px;
+      }
+    }
+
+    /* Top Floating Screen Selector (for design review) */
+    .screen-switcher {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      background: rgba(26, 26, 34, 0.92);
+      backdrop-filter: blur(16px);
+      padding: 4px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+      gap: 3px;
+      max-width: 95vw;
+      overflow-x: auto;
+    }
+
+    .screen-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-family: var(--font-main);
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 5px 9px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .screen-btn.active {
+      background: var(--accent-primary);
+      color: #fff;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      height: 48px;
+      padding: 12px 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      z-index: 10;
+    }
+
+    .server-status-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      transition: all 0.25s ease;
+    }
+
+    .server-status-dot.vieneu {
+      color: var(--accent-teal);
+      background: rgba(20, 184, 166, 0.12);
+      border: 1px solid rgba(20, 184, 166, 0.25);
+    }
+
+    .server-status-dot.free {
+      color: #38BDF8;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    .server-status-dot.azure {
+      color: #A78BFA;
+      background: rgba(167, 139, 250, 0.12);
+      border: 1px solid rgba(167, 139, 250, 0.25);
+    }
+
+    .dot-pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .server-status-dot.vieneu .dot-pulse {
+      background: var(--accent-teal);
+      box-shadow: 0 0 8px var(--accent-teal);
+    }
+
+    .server-status-dot.free .dot-pulse {
+      background: #38BDF8;
+      box-shadow: 0 0 8px #38BDF8;
+    }
+
+    .server-status-dot.azure .dot-pulse {
+      background: #A78BFA;
+      box-shadow: 0 0 8px #A78BFA;
+    }
+
+    /* Screen Views */
+    .screen-view {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      padding-bottom: 80px;
+    }
+
+    .screen-view.active {
+      display: flex;
+    }
+
+    /* ─── SCREEN 1: HOME / PASTE ─── */
+    .home-header {
+      padding: 20px 20px 14px;
+    }
+
+    .brand-title {
+      font-size: 25px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #FFFFFF 60%, #A1A1AA 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-sub {
+      font-size: 12.5px;
+      color: var(--text-tertiary);
+      margin-top: 3px;
+    }
+
+    /* Model Switcher Rail */
+    .model-selector-wrap {
+      padding: 0 20px 14px;
+    }
+
+    .model-tabs {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 3px;
+      display: flex;
+      gap: 3px;
+    }
+
+    .model-tab {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-family: var(--font-main);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 8px 4px;
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+    }
+
+    .model-tab.active {
+      background: var(--bg-elevated);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    .model-tab.active.tab-vieneu {
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      color: #C7D2FE;
+    }
+
+    .model-tab.active.tab-free {
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #BAE6FD;
+    }
+
+    .model-tab.active.tab-azure {
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      color: #DDD6FE;
+    }
+
+    .model-desc-pill {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 6px;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Paste Box */
+    .paste-container {
+      padding: 0 20px 16px;
+    }
+
+    .paste-box {
+      background: var(--bg-surface);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-lg);
+      padding: 6px 8px 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      transition: all 0.2s ease;
+    }
+
+    .paste-box:focus-within {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+      background: var(--bg-elevated);
+    }
+
+    .paste-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 14px;
+    }
+
+    .paste-input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .paste-btn {
+      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+      border: none;
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 10px 15px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+      white-space: nowrap;
+    }
+
+    /* Chips Row */
+    .chip-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 0 20px 18px;
+      scrollbar-width: none;
+    }
+
+    .chip-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .voice-chip {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 13px;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .voice-chip.active {
+      background: var(--bg-elevated);
+      color: #fff;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+    }
+
+    /* History Feed */
+    .feed-section {
+      padding: 0 20px;
+    }
+
+    .feed-heading {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .media-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 10px;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .media-card:active {
+      transform: scale(0.98);
+      background: var(--bg-elevated);
+    }
+
+    .card-thumb {
+      width: 106px;
+      height: 64px;
+      border-radius: var(--radius-md);
+      position: relative;
+      background: #1e1e24;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-badge {
+      position: absolute;
+      bottom: 4px;
+      left: 4px;
+      background: rgba(10, 10, 12, 0.85);
+      backdrop-filter: blur(4px);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+
+    .card-badge.badge-cache {
+      color: var(--accent-teal);
+      border: 1px solid rgba(20, 184, 166, 0.3);
+    }
+
+    .card-badge.badge-cloud {
+      color: #38BDF8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .card-badge.badge-wait {
+      color: var(--accent-amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .card-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--text-primary);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-meta {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+
+    /* ─── SCREEN 2: 60S COUNTDOWN / WARMUP ─── */
+    .warmup-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: #0A0A0C;
+    }
+
+    .warmup-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 58%;
+      background-size: cover;
+      background-position: center;
+      filter: blur(40px) brightness(0.4);
+      transform: scale(1.1);
+      z-index: 1;
+    }
+
+    .warmup-gradient {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 58%;
+      background: linear-gradient(180deg, rgba(10,10,12,0.3) 0%, rgba(10,10,12,0.85) 75%, #0A0A0C 100%);
+      z-index: 2;
+    }
+
+    .warmup-stage {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 42px 20px 20px;
+      flex: 1;
+    }
+
+    .warmup-mode-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .ring-container {
+      position: relative;
+      width: 176px;
+      height: 176px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 22px;
+    }
+
+    .ring-svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+
+    .ring-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-width: 5;
+    }
+
+    .ring-progress {
+      fill: none;
+      stroke: url(#indigoGradient);
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-dasharray: 502;
+      stroke-dashoffset: 80;
+      transition: stroke-dashoffset 0.8s linear;
+    }
+
+    .ring-center {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ring-num {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .ring-unit {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--accent-amber);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .warmup-status-title {
+      font-size: 16.5px;
+      font-weight: 600;
+      color: #FFFFFF;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .warmup-status-sub {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      text-align: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      margin-bottom: 20px;
+    }
+
+    /* Buffer Ticks Gauge */
+    .buffer-gauge {
+      display: flex;
+      gap: 4px;
+      margin-bottom: auto;
+    }
+
+    .buffer-tick {
+      width: 8px;
+      height: 15px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .buffer-tick.filled {
+      background: var(--accent-teal);
+      box-shadow: 0 0 8px rgba(20, 184, 166, 0.6);
+    }
+
+    .buffer-tick.cooking {
+      background: var(--accent-amber);
+      animation: pulse-cooking 1.2s infinite;
+    }
+
+    @keyframes pulse-cooking {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    /* Bottom Warmup Card */
+    .warmup-card {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 16px 18px;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+    }
+
+    .warmup-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .badge-voice {
+      font-size: 11px;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent-primary);
+      padding: 3px 9px;
+      border-radius: var(--radius-full);
+    }
+
+    .badge-lang {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-weight: 600;
+    }
+
+    .warmup-video-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      line-height: 1.35;
+      color: #fff;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .escape-hatch {
+      width: 100%;
+      background: transparent;
+      border: 1px dashed rgba(255, 255, 255, 0.18);
+      color: #38BDF8;
+      font-family: var(--font-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 10px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* ─── SCREEN 2B: QUICK WARMUP (FREE / AZURE) ─── */
+    .quick-warmup-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 24px;
+      text-align: center;
+    }
+
+    .cloud-pulse-box {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .cloud-pulse-box.free {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38BDF8;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
+    }
+
+    .cloud-pulse-box.azure {
+      background: rgba(167, 139, 250, 0.12);
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      color: #A78BFA;
+      box-shadow: 0 0 30px rgba(167, 139, 250, 0.2);
+    }
+
+    .pulse-ring-wave {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+      animation: pulse-wave 1.8s infinite cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    @keyframes pulse-wave {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    .quick-progress-track {
+      width: 100%;
+      max-width: 260px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 16px 0 10px;
+    }
+
+    .quick-progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .quick-progress-fill.free {
+      background: linear-gradient(90deg, #38BDF8, #818CF8);
+    }
+
+    .quick-progress-fill.azure {
+      background: linear-gradient(90deg, #A78BFA, #C084FC);
+    }
+
+    /* ─── SCREEN 3: PLAYER SCREEN ─── */
+    .player-video-box {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      position: relative;
+    }
+
+    .player-video-box iframe,
+    .player-video-box video {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .mock-video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mock-video-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Subtitle HUD */
+    .subtitle-hud {
+      background: linear-gradient(180deg, #101014 0%, #16161C 100%);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 18px;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .sub-line-orig {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+      font-weight: 400;
+    }
+
+    .sub-line-vi {
+      font-size: 15.5px;
+      font-weight: 600;
+      color: #FFFFFF;
+      line-height: 1.35;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    }
+
+    /* Dual Audio Sliders */
+    .audio-dock {
+      background: var(--bg-surface);
+      margin: 12px 16px 8px;
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .audio-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .audio-slider-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .slider-label {
+      width: 76px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .slider-track {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    .slider-fill {
+      height: 100%;
+      border-radius: 3px;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .slider-fill.goc {
+      width: 20%;
+      background: var(--text-tertiary);
+    }
+
+    .slider-fill.dub {
+      width: 90%;
+      background: linear-gradient(90deg, #6366F1, #8B5CF6);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    }
+
+    .slider-val {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      width: 32px;
+      text-align: right;
+    }
+
+    /* Playback Transport */
+    .transport-dock {
+      padding: 10px 20px;
+    }
+
+    .seekbar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .seekbar-track {
+      flex: 1;
+      height: 5px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 3px;
+      position: relative;
+    }
+
+    .seekbar-buffered {
+      width: 60%;
+      height: 100%;
+      background: rgba(255,255,255,0.25);
+      border-radius: 3px;
+    }
+
+    .seekbar-played {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 34%;
+      height: 100%;
+      background: var(--accent-primary);
+      border-radius: 3px;
+    }
+
+    .seekbar-thumb {
+      position: absolute;
+      top: 50%;
+      left: 34%;
+      transform: translate(-50%, -50%);
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      box-shadow: 0 0 8px rgba(0,0,0,0.6);
+    }
+
+    .time-stamp {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .buttons-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+    }
+
+    .btn-skip {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .btn-play-pause {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      color: #0A0A0C;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255,255,255,0.25);
+    }
+
+    /* ─── SCREEN 4: SETTINGS ─── */
+    .settings-wrapper {
+      padding: 20px;
+    }
+
+    .settings-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .settings-group {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .group-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .settings-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .row-text-title {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .row-text-desc {
+      font-size: 11.5px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    /* Model Selection Cards in Settings */
+    .model-card-opt {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+
+    .model-card-opt:last-child {
+      margin-bottom: 0;
+    }
+
+    .model-card-opt.active {
+      border-color: var(--accent-primary);
+      background: rgba(99, 102, 241, 0.12);
+    }
+
+    .model-card-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .model-card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .model-card-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .model-card-sub {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    .model-radio-circle {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .model-card-opt.active .model-radio-circle {
+      border-color: var(--accent-primary);
+    }
+
+    .model-card-opt.active .model-radio-circle::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+    }
+
+    /* Azure Config Input */
+    .azure-config-panel {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255,255,255,0.1);
+    }
+
+    .input-field {
+      width: 100%;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 12.5px;
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      margin-top: 6px;
+      outline: none;
+    }
+
+    .input-field:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .segmented-control {
+      display: flex;
+      background: var(--bg-elevated);
+      padding: 3px;
+      border-radius: var(--radius-md);
+      gap: 2px;
+    }
+
+    .segment-opt {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 5px 9px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .segment-opt.active {
+      background: var(--accent-primary);
+      color: #fff;
+    }
+
+    .btn-action {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      width: 100%;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* Bottom Nav Bar */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 68px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(24px);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom, 8px);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      font-family: var(--font-main);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+
+    .nav-item.active {
+      color: var(--accent-primary);
+    }
+
+    .nav-icon {
+      width: 22px;
+      height: 22px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen Switcher Bar (For review / testing) -->
+  <div class="screen-switcher">
+    <button class="screen-btn active" onclick="switchScreen('screen-home')">1. Home</button>
+    <button class="screen-btn" onclick="switchScreen('screen-warmup')">2. Chờ 60s (VieNeu)</button>
+    <button class="screen-btn" onclick="switchScreen('screen-quick-warmup')">2b. Nhanh (Free/Azure)</button>
+    <button class="screen-btn" onclick="switchScreen('screen-player')">3. Trình phát</button>
+    <button class="screen-btn" onclick="switchScreen('screen-settings')">4. Cài đặt</button>
+  </div>
+
+  <div class="mobile-frame">
+
+    <!-- Top Status Bar -->
+    <div class="status-bar">
+      <span>9:41</span>
+      <div id="statusBarIndicator" class="server-status-dot vieneu">
+        <div class="dot-pulse"></div>
+        <span id="statusBarText">GTX 1660 SUPER</span>
+      </div>
+    </div>
+
+    <!-- ─── SCREEN 1: HOME / PASTE ─── -->
+    <div id="screen-home" class="screen-view active">
+      <div class="home-header">
+        <h1 class="brand-title">VieNeu Player</h1>
+        <p class="brand-sub">Biến PC thành máy chủ lồng tiếng riêng cho điện thoại</p>
+      </div>
+
+      <!-- Model Switcher Selector -->
+      <div class="model-selector-wrap">
+        <div class="model-tabs">
+          <button class="model-tab active tab-vieneu" onclick="selectModel('vieneu')">
+            <span>⚡ VieNeu GPU</span>
+          </button>
+          <button class="model-tab tab-free" onclick="selectModel('free')">
+            <span>☁️ Miễn Phí (Edge)</span>
+          </button>
+          <button class="model-tab tab-azure" onclick="selectModel('azure')">
+            <span>💎 Azure Cloud</span>
+          </button>
+        </div>
+        <div id="modelDescText" class="model-desc-pill">
+          <span>● VieNeu Local: Giọng tự nhiên AI · Cần 60s nạp GPU</span>
+        </div>
+      </div>
+
+      <!-- URL Input Box -->
+      <div class="paste-container">
+        <div class="paste-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-tertiary)"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+          <input type="text" id="youtubeInput" class="paste-input" placeholder="Dán link YouTube tại đây..." value="https://youtube.com/watch?v=nzHY-muy2Mw">
+          <button class="paste-btn" onclick="handleLaunchFromHome()">
+            <span>Dán & Phát</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Voice Chips (Dynamic by Model) -->
+      <div class="chip-scroll" id="voiceChipsContainer">
+        <!-- Rendered by JS based on selected model -->
+      </div>
+
+      <!-- Feed Section -->
+      <div class="feed-section">
+        <div class="feed-heading">
+          <span>Gần Đây & Bộ Nhớ Cache</span>
+          <span style="font-size: 10px; color: var(--accent-teal)">143 files đệm</span>
+        </div>
+
+        <!-- Card 1: VieNeu Cached -->
+        <div class="media-card" onclick="handleCardClick('cached')">
+          <div class="card-thumb">
+            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300" alt="thumb">
+            <div class="card-badge badge-cache">⚡ 0s Chờ</div>
+          </div>
+          <div class="card-info">
+            <div class="card-title">Why being bilingual is good for your brain | BBC Ideas</div>
+            <div class="card-meta">5:12 · VieNeu Anh Khôi · Đã nạp cache</div>
+          </div>
+        </div>
+
+        <!-- Card 2: Free Cloud Video -->
+        <div class="media-card" onclick="handleCardClick('cloud')">
+          <div class="card-thumb">
+            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300" alt="thumb">
+            <div class="card-badge badge-cloud">☁️ Nhanh</div>
+          </div>
+          <div class="card-info">
+            <div class="card-title">How Quantum Computers Actually Work | Veritasium</div>
+            <div class="card-meta">14:20 · Miễn phí Hoài My · Phát tức thì</div>
+          </div>
+        </div>
+
+        <!-- Card 3: Uncached VieNeu Video -->
+        <div class="media-card" onclick="handleCardClick('uncached')">
+          <div class="card-thumb">
+            <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=300" alt="thumb">
+            <div class="card-badge badge-wait">60s Nạp</div>
+          </div>
+          <div class="card-info">
+            <div class="card-title">The Simple Japanese Habit That Changes Everything</div>
+            <div class="card-meta">8:45 · VieNeu GPU · Video mới</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SCREEN 2: 60S COUNTDOWN / WARMUP (VIENEU GPU) ─── -->
+    <div id="screen-warmup" class="screen-view">
+      <div class="warmup-wrapper">
+        <div class="warmup-backdrop" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600');"></div>
+        <div class="warmup-gradient"></div>
+
+        <div class="warmup-stage">
+          <svg width="0" height="0">
+            <defs>
+              <linearGradient id="indigoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#6366F1" />
+                <stop offset="100%" stop-color="#8B5CF6" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <div class="warmup-mode-pill">
+            <span style="color: var(--accent-teal)">● GPU Cục Bộ</span>
+            <span>GTX 1660 SUPER</span>
+          </div>
+
+          <!-- Animated Countdown Ring -->
+          <div class="ring-container">
+            <svg class="ring-svg" viewBox="0 0 180 180">
+              <circle class="ring-bg" cx="90" cy="90" r="76" />
+              <circle class="ring-progress" id="countdownCircle" cx="90" cy="90" r="76" />
+            </svg>
+            <div class="ring-center">
+              <span class="ring-num" id="countdownSec">59</span>
+              <span class="ring-unit">GIÂY NẠP</span>
+            </div>
+          </div>
+
+          <div class="warmup-status-title" id="warmupStatusTitle">Đang tổng hợp giọng nói AI</div>
+          <div class="warmup-status-sub" id="warmupStatusSub">⚡ GPU đang sinh 15 câu đầu đón đầu video...</div>
+
+          <!-- Buffer Ticks -->
+          <div class="buffer-gauge">
+            <div class="buffer-tick filled"></div>
+            <div class="buffer-tick filled"></div>
+            <div class="buffer-tick filled"></div>
+            <div class="buffer-tick filled"></div>
+            <div class="buffer-tick cooking"></div>
+            <div class="buffer-tick"></div>
+            <div class="buffer-tick"></div>
+            <div class="buffer-tick"></div>
+            <div class="buffer-tick"></div>
+            <div class="buffer-tick"></div>
+            <div class="buffer-tick"></div>
+            <div class="buffer-tick"></div>
+          </div>
+
+          <!-- Pinned Bottom Card -->
+          <div class="warmup-card">
+            <div class="warmup-card-meta">
+              <span class="badge-voice" id="warmupVoiceBadge">Anh Khôi — Nam · Bắc</span>
+              <span class="badge-lang">EN ➔ VI</span>
+            </div>
+            <div class="warmup-video-title">Why being bilingual is good for your brain | BBC Ideas</div>
+            <button class="escape-hatch" onclick="switchToFreeEscape()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span>Xem gấp? Chuyển sang Miễn Phí Edge Cloud (Bỏ chờ 60s)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SCREEN 2B: QUICK WARMUP (FREE / AZURE CLOUD) ─── -->
+    <div id="screen-quick-warmup" class="screen-view">
+      <div class="quick-warmup-container">
+        <div id="cloudPulseBox" class="cloud-pulse-box free">
+          <div class="pulse-ring-wave"></div>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+        </div>
+
+        <h3 id="quickWarmupTitle" style="font-size: 19px; font-weight: 700; color: #fff; margin-bottom: 6px;">Nạp Nhanh Điện Toán Đám Mây</h3>
+        <p id="quickWarmupSub" style="font-size: 13px; color: var(--text-secondary); max-width: 280px; line-height: 1.4;">Đang kết nối API Cloud — Không tốn tài nguyên GPU máy tính...</p>
+
+        <div class="quick-progress-track">
+          <div id="quickProgressFill" class="quick-progress-fill free"></div>
+        </div>
+        <span id="quickProgressText" style="font-size: 11px; color: var(--text-tertiary); font-weight: 600;">Đang nạp câu 2/3...</span>
+
+        <div style="margin-top: 32px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 12px 18px; width: 100%; max-width: 320px; text-align: left;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <span id="quickModelBadge" style="font-size: 11px; font-weight: 600; color: #38BDF8;">☁️ Miễn Phí (Edge TTS)</span>
+            <span style="font-size: 10px; color: var(--text-tertiary);">Độ trễ: ~1.2s</span>
+          </div>
+          <div style="font-size: 12.5px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Why being bilingual is good for your brain</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SCREEN 3: PLAYER SCREEN ─── -->
+    <div id="screen-player" class="screen-view">
+      <!-- 16:9 Video Box -->
+      <div class="player-video-box">
+        <div class="mock-video-overlay" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800');">
+          <div class="mock-video-tag" id="playerTagBadge" style="color: var(--accent-teal);">● VieNeu: Anh Khôi</div>
+        </div>
+      </div>
+
+      <!-- Subtitle HUD -->
+      <div class="subtitle-hud">
+        <div class="sub-line-orig">Speaking more than one language has obvious practical benefits...</div>
+        <div class="sub-line-vi">Biết nhiều hơn một ngôn ngữ đem lại những lợi ích thực tế vô cùng rõ rệt...</div>
+      </div>
+
+      <!-- Dual Audio Console -->
+      <div class="audio-dock">
+        <div class="audio-slider-row">
+          <div class="slider-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+            <span>Gốc</span>
+          </div>
+          <div class="slider-track">
+            <div class="slider-fill goc"></div>
+          </div>
+          <div class="slider-val">20%</div>
+        </div>
+
+        <div class="audio-slider-row">
+          <div class="slider-label" style="color: #fff">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary)"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            <span>Lồng tiếng</span>
+          </div>
+          <div class="slider-track">
+            <div class="slider-fill dub"></div>
+          </div>
+          <div class="slider-val" style="color: #fff">90%</div>
+        </div>
+      </div>
+
+      <!-- Playback Transport Controls -->
+      <div class="transport-dock">
+        <div class="seekbar-row">
+          <span class="time-stamp">01:42</span>
+          <div class="seekbar-track">
+            <div class="seekbar-buffered"></div>
+            <div class="seekbar-played"></div>
+            <div class="seekbar-thumb"></div>
+          </div>
+          <span class="time-stamp">-03:30</span>
+        </div>
+
+        <div class="buttons-row">
+          <button class="btn-skip">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
+            <span>-10s</span>
+          </button>
+
+          <button class="btn-play-pause">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+          </button>
+
+          <button class="btn-skip">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
+            <span>+10s</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- In-player Voice Switcher Row -->
+      <div class="chip-scroll" style="padding: 10px 20px;" id="playerVoiceChips">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ─── SCREEN 4: SETTINGS ─── -->
+    <div id="screen-settings" class="screen-view">
+      <div class="settings-wrapper">
+        <h2 class="settings-title">Cài Đặt Hệ Thống</h2>
+
+        <!-- Group 0: Model Engine Architecture -->
+        <div class="settings-group">
+          <div class="group-label">Bộ Máy Lồng Tiếng (TTS Engine)</div>
+
+          <!-- Option 1: VieNeu -->
+          <div class="model-card-opt active" id="settingOptVieNeu" onclick="selectModelFromSettings('vieneu')">
+            <div class="model-card-left">
+              <div class="model-card-icon" style="background: rgba(99, 102, 241, 0.2); color: #818CF8">⚡</div>
+              <div>
+                <div class="model-card-name">VieNeu AI (Local GPU)</div>
+                <div class="model-card-sub">Khuyên dùng · Giọng tự nhiên nhất · GTX 1660 SUPER</div>
+              </div>
+            </div>
+            <div class="model-radio-circle"></div>
+          </div>
+
+          <!-- Option 2: Free Edge -->
+          <div class="model-card-opt" id="settingOptFree" onclick="selectModelFromSettings('free')">
+            <div class="model-card-left">
+              <div class="model-card-icon" style="background: rgba(56, 189, 248, 0.2); color: #38BDF8">☁️</div>
+              <div>
+                <div class="model-card-name">Miễn Phí (Edge Cloud)</div>
+                <div class="model-card-sub">100% Miễn phí · Không tốn GPU · Phát tức thì</div>
+              </div>
+            </div>
+            <div class="model-radio-circle"></div>
+          </div>
+
+          <!-- Option 3: Azure Cloud -->
+          <div class="model-card-opt" id="settingOptAzure" onclick="selectModelFromSettings('azure')">
+            <div class="model-card-left">
+              <div class="model-card-icon" style="background: rgba(167, 139, 250, 0.2); color: #A78BFA">💎</div>
+              <div>
+                <div class="model-card-name">Azure TTS (Microsoft Cloud)</div>
+                <div class="model-card-sub">Giọng chuẩn phòng thu Neural · Độ ổn định cao</div>
+              </div>
+            </div>
+            <div class="model-radio-circle"></div>
+          </div>
+
+          <!-- Azure Specific Configuration Form -->
+          <div id="azureConfigSection" class="azure-config-panel" style="display: none;">
+            <div class="row-text-title" style="margin-bottom: 4px;">Cấu hình Microsoft Azure Speech</div>
+            <input type="password" class="input-field" placeholder="Nhập Azure API Key..." value="••••••••••••••••••••••••">
+            <input type="text" class="input-field" placeholder="Vùng (Region), ví dụ: southeastasia" value="southeastasia">
+            <button class="btn-action" style="margin-top: 8px; font-size: 11.5px; padding: 7px;">
+              <span>Kiểm tra kết nối Azure (Ping: 42ms OK)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Group 1: Preferences -->
+        <div class="settings-group">
+          <div class="group-label">Trải Nghiệm & Hiển Thị</div>
+          
+          <div class="settings-row">
+            <div>
+              <div class="row-text-title">Giọng đọc ưu tiên</div>
+              <div class="row-text-desc" id="prefVoiceDesc">Anh Khôi — Nam · Bắc · Truyền cảm</div>
+            </div>
+            <button class="segment-opt active" onclick="switchScreen('screen-home')">Đổi</button>
+          </div>
+
+          <div class="settings-row">
+            <div>
+              <div class="row-text-title">Chế độ phụ đề</div>
+              <div class="row-text-desc">Hiển thị song ngữ gốc và dịch</div>
+            </div>
+            <div class="segmented-control">
+              <button class="segment-opt active">Song ngữ</button>
+              <button class="segment-opt">Chỉ TV</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group 2: Cache Storage -->
+        <div class="settings-group">
+          <div class="group-label">Bộ Nhớ Đệm Âm Thanh (PC)</div>
+          
+          <div class="settings-row">
+            <div>
+              <div class="row-text-title">Dung lượng Cache đã lưu</div>
+              <div class="row-text-desc">143 files (~42.5 MB) trên GTX 1660 SUPER</div>
+            </div>
+          </div>
+
+          <button class="btn-action">
+            <span>🧹 Dọn dẹp cache tạm (Giữ file audio)</span>
+          </button>
+        </div>
+
+        <!-- Group 3: Server Connection -->
+        <div class="settings-group">
+          <div class="group-label">Kết Nối Máy Chủ PC</div>
+          
+          <div class="settings-row">
+            <div>
+              <div class="row-text-title">Địa chỉ IP Máy Tính</div>
+              <div class="row-text-desc">http://192.168.1.15:3000</div>
+            </div>
+            <span style="font-size: 11px; color: var(--accent-teal); font-weight: 700;">12ms</span>
+          </div>
+
+          <button class="btn-action" style="background: rgba(99, 102, 241, 0.15); color: #818CF8; border-color: rgba(99, 102, 241, 0.3)">
+            <span>📷 Quét mã QR từ TransDuck Studio</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+      <button class="nav-item active" onclick="switchScreen('screen-home')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span>Trang chủ</span>
+      </button>
+
+      <button class="nav-item" onclick="switchScreen('screen-player')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+        <span>Trình phát</span>
+      </button>
+
+      <button class="nav-item" onclick="switchScreen('screen-settings')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Cài đặt</span>
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    // State Architecture
+    const state = {
+      model: 'vieneu', // 'vieneu' | 'free' | 'azure'
+      activeVoice: 'Anh Khôi',
+      voicesByModel: {
+        vieneu: [
+          { name: 'Anh Khôi', tag: 'Bắc · Trầm ấm', icon: '⚡' },
+          { name: 'Mỹ Duyên', tag: 'Nam · Nhẹ nhàng', icon: '🎙️' },
+          { name: 'Minh Đức', tag: 'Bắc · Trực diện', icon: '🎙️' },
+          { name: 'Kim Thanh', tag: 'Nam · Truyền cảm', icon: '🎙️' },
+          { name: 'Thu Trang', tag: 'Bắc · Trong trẻo', icon: '🎙️' }
+        ],
+        free: [
+          { name: 'Hoài My', tag: 'Nữ · Edge Cloud', icon: '☁️' },
+          { name: 'Nam Minh', tag: 'Nam · Edge Cloud', icon: '☁️' }
+        ],
+        azure: [
+          { name: 'Hoài My Neural', tag: 'Nữ · Azure Studio', icon: '💎' },
+          { name: 'Nam Minh Neural', tag: 'Nam · Azure Studio', icon: '💎' }
+        ]
+      }
+    };
+
+    function selectModel(modelKey) {
+      state.model = modelKey;
+      
+      // Update Tab CSS
+      document.querySelectorAll('.model-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.getAttribute('onclick').includes(modelKey));
+      });
+
+      // Update Top Status Bar Indicator
+      const statusIndicator = document.getElementById('statusBarIndicator');
+      const statusText = document.getElementById('statusBarText');
+      statusIndicator.className = 'server-status-dot ' + modelKey;
+
+      const descMap = {
+        vieneu: '● VieNeu Local: Giọng tự nhiên AI · Cần 60s nạp GPU',
+        free: '☁️ Miễn Phí Edge Cloud: Phát ngay lập tức · Không tốn GPU',
+        azure: '💎 Azure TTS Cloud: Chuẩn phòng thu Neural · Tốc độ siêu tốc'
+      };
+      const statusMap = {
+        vieneu: 'GTX 1660 SUPER',
+        free: 'Edge Cloud Free',
+        azure: 'Azure Speech Pro'
+      };
+      
+      document.getElementById('modelDescText').innerHTML = `<span>${descMap[modelKey]}</span>`;
+      statusText.textContent = statusMap[modelKey];
+
+      // Set default active voice for model
+      state.activeVoice = state.voicesByModel[modelKey][0].name;
+
+      renderVoiceChips();
+      updatePlayerModelBadge();
+      syncSettingsUI();
+    }
+
+    function selectModelFromSettings(modelKey) {
+      document.querySelectorAll('.model-card-opt').forEach(opt => opt.classList.remove('active'));
+      if (modelKey === 'vieneu') document.getElementById('settingOptVieNeu').classList.add('active');
+      if (modelKey === 'free') document.getElementById('settingOptFree').classList.add('active');
+      if (modelKey === 'azure') document.getElementById('settingOptAzure').classList.add('active');
+
+      const azureSec = document.getElementById('azureConfigSection');
+      if (azureSec) azureSec.style.display = modelKey === 'azure' ? 'block' : 'none';
+
+      selectModel(modelKey);
+    }
+
+    function syncSettingsUI() {
+      document.querySelectorAll('.model-card-opt').forEach(opt => opt.classList.remove('active'));
+      if (state.model === 'vieneu') document.getElementById('settingOptVieNeu')?.classList.add('active');
+      if (state.model === 'free') document.getElementById('settingOptFree')?.classList.add('active');
+      if (state.model === 'azure') document.getElementById('settingOptAzure')?.classList.add('active');
+
+      const azureSec = document.getElementById('azureConfigSection');
+      if (azureSec) azureSec.style.display = state.model === 'azure' ? 'block' : 'none';
+
+      const prefDesc = document.getElementById('prefVoiceDesc');
+      if (prefDesc) {
+        prefDesc.textContent = `${state.activeVoice} — Model ${state.model.toUpperCase()}`;
+      }
+    }
+
+    function renderVoiceChips() {
+      const container = document.getElementById('voiceChipsContainer');
+      const playerChips = document.getElementById('playerVoiceChips');
+      const voices = state.voicesByModel[state.model];
+
+      if (container) {
+        container.innerHTML = voices.map(v => `
+          <div class="voice-chip ${v.name === state.activeVoice ? 'active' : ''}" onclick="pickVoice('${v.name}')">
+            <span>${v.icon} ${v.name}</span>
+          </div>
+        `).join('');
+      }
+
+      if (playerChips) {
+        playerChips.innerHTML = voices.map(v => `
+          <div class="voice-chip ${v.name === state.activeVoice ? 'active' : ''}" onclick="pickVoice('${v.name}')">
+            <span>${v.icon} ${v.name}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    function pickVoice(voiceName) {
+      state.activeVoice = voiceName;
+      renderVoiceChips();
+      updatePlayerModelBadge();
+      
+      const badge = document.getElementById('warmupVoiceBadge');
+      if (badge) badge.textContent = `${voiceName} (${state.model.toUpperCase()})`;
+    }
+
+    function updatePlayerModelBadge() {
+      const tag = document.getElementById('playerTagBadge');
+      if (!tag) return;
+      if (state.model === 'vieneu') {
+        tag.textContent = `● VieNeu: ${state.activeVoice}`;
+        tag.style.color = 'var(--accent-teal)';
+      } else if (state.model === 'free') {
+        tag.textContent = `☁️ Free: ${state.activeVoice}`;
+        tag.style.color = '#38BDF8';
+      } else {
+        tag.textContent = `💎 Azure: ${state.activeVoice}`;
+        tag.style.color = '#A78BFA';
+      }
+    }
+
+    // Launch Logic from Home
+    function handleLaunchFromHome() {
+      if (state.model === 'vieneu') {
+        switchScreen('screen-warmup');
+      } else {
+        triggerQuickWarmup(state.model);
+      }
+    }
+
+    function handleCardClick(type) {
+      if (type === 'cached') {
+        // Instant play for cached videos
+        switchScreen('screen-player');
+      } else if (type === 'cloud') {
+        // Free cloud quick play
+        selectModel('free');
+        triggerQuickWarmup('free');
+      } else {
+        // Uncached VieNeu: 60s preparation
+        selectModel('vieneu');
+        switchScreen('screen-warmup');
+      }
+    }
+
+    function switchToFreeEscape() {
+      selectModel('free');
+      triggerQuickWarmup('free');
+    }
+
+    // Screen Switching Engine
+    function switchScreen(screenId) {
+      document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(screenId);
+      if (target) target.classList.add('active');
+
+      document.querySelectorAll('.screen-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('onclick').includes(screenId));
+      });
+
+      document.querySelectorAll('.nav-item').forEach(nav => {
+        const onclick = nav.getAttribute('onclick');
+        if (onclick) {
+          nav.classList.toggle('active', onclick.includes(screenId));
+        }
+      });
+
+      if (screenId === 'screen-warmup') {
+        startVieNeuCountdownSimulation();
+      } else if (screenId === 'screen-quick-warmup') {
+        triggerQuickWarmup(state.model === 'vieneu' ? 'free' : state.model);
+      }
+    }
+
+    // 60s Countdown for VieNeu
+    let countdownTimer = null;
+    function startVieNeuCountdownSimulation() {
+      if (countdownTimer) clearInterval(countdownTimer);
+      let sec = 59;
+      const secEl = document.getElementById('countdownSec');
+      const circleEl = document.getElementById('countdownCircle');
+      const titleEl = document.getElementById('warmupStatusTitle');
+      const subEl = document.getElementById('warmupStatusSub');
+      const totalDash = 502;
+
+      countdownTimer = setInterval(() => {
+        sec--;
+        if (sec <= 0) {
+          clearInterval(countdownTimer);
+          switchScreen('screen-player');
+          return;
+        }
+        if (secEl) secEl.textContent = sec < 10 ? '0' + sec : sec;
+        if (circleEl) {
+          const offset = totalDash - (sec / 60) * totalDash;
+          circleEl.style.strokeDashoffset = offset;
+        }
+
+        // Real-time stage messaging
+        if (sec > 45) {
+          if (titleEl) titleEl.textContent = "Đang tải & dịch phụ đề qua Groq AI...";
+          if (subEl) subEl.textContent = "⚡ Phân tích câu thoại tiếng Anh và dịch sang Tiếng Việt";
+        } else if (sec > 10) {
+          if (titleEl) titleEl.textContent = `VieNeu GPU đang sinh giọng ${state.activeVoice}...`;
+          if (subEl) subEl.textContent = `⚡ GTX 1660 SUPER: Đã nạp đệm ${Math.floor((60 - sec) / 3)}/15 câu`;
+        } else {
+          if (titleEl) titleEl.textContent = "Sắp hoàn tất bộ đệm đón đầu!";
+          if (subEl) subEl.textContent = "✨ Chuẩn bị phát mượt mà không độ trễ...";
+        }
+      }, 1000);
+    }
+
+    // Quick Cloud Warmup for Free / Azure (2 - 3 seconds)
+    let quickTimer = null;
+    function triggerQuickWarmup(modelKey) {
+      switchScreen('screen-quick-warmup');
+      if (quickTimer) clearInterval(quickTimer);
+
+      const pulseBox = document.getElementById('cloudPulseBox');
+      const title = document.getElementById('quickWarmupTitle');
+      const sub = document.getElementById('quickWarmupSub');
+      const fill = document.getElementById('quickProgressFill');
+      const badge = document.getElementById('quickModelBadge');
+      const progText = document.getElementById('quickProgressText');
+
+      if (pulseBox) pulseBox.className = 'cloud-pulse-box ' + modelKey;
+      if (fill) fill.className = 'quick-progress-fill ' + modelKey;
+
+      if (modelKey === 'azure') {
+        if (title) title.textContent = "Kết Nối Azure Speech Cloud";
+        if (sub) sub.textContent = "Khởi tạo luồng Neural Audio qua Microsoft Azure...";
+        if (badge) {
+          badge.textContent = "💎 Azure TTS (Neural Cloud)";
+          badge.style.color = "#A78BFA";
+        }
+      } else {
+        if (title) title.textContent = "Kết Nối Edge TTS Cloud (Miễn Phí)";
+        if (sub) sub.textContent = "Khởi tạo luồng phát tức thì — 0s chờ GPU...";
+        if (badge) {
+          badge.textContent = "☁️ Miễn Phí (Edge TTS)";
+          badge.style.color = "#38BDF8";
+        }
+      }
+
+      let pct = 0;
+      quickTimer = setInterval(() => {
+        pct += 25;
+        if (fill) fill.style.width = pct + '%';
+        if (progText) {
+          if (pct === 25) progText.textContent = "Đang dịch phụ đề qua Groq AI...";
+          if (pct === 50) progText.textContent = `Đang nạp câu 1/3 (${state.activeVoice})...`;
+          if (pct === 75) progText.textContent = "Đã nạp 3 câu — Sẵn sàng phát!";
+        }
+        if (pct >= 100) {
+          clearInterval(quickTimer);
+          setTimeout(() => {
+            switchScreen('screen-player');
+          }, 300);
+        }
+      }, 300);
+    }
+
+    // Initialize
+    selectModel('vieneu');
+
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
