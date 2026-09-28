@@ -3293,8 +3293,16 @@
       const wrappers = document.querySelectorAll('.feed-item-wrapper');
       wrappers.forEach(wrapper => {
         const card = wrapper.querySelector('.media-card');
-        const badgeType = wrapper.getAttribute('data-badge');
-        if (badgeType === 'cloud') return; // Cloud-only cards cannot be deleted
+        if (!card) return;
+
+        // Direct tap on delete zone
+        const dangerZone = wrapper.querySelector('.feed-danger-zone');
+        if (dangerZone) {
+          dangerZone.onclick = (e) => {
+            e.stopPropagation();
+            triggerCardDelete(wrapper.getAttribute('data-id'));
+          };
+        }
 
         card.addEventListener('touchstart', e => {
           if (swipeState.revealedCard && swipeState.revealedCard !== card) {
@@ -3305,8 +3313,10 @@
 
           swipeState.startX = e.touches[0].clientX;
           swipeState.startY = e.touches[0].clientY;
+          swipeState.currentX = 0;
           swipeState.card = card;
           swipeState.wrapper = wrapper;
+          swipeState.isHorizontal = null;
           swipeState.isSwiping = false;
           card.classList.add('swiping');
         }, { passive: true });
@@ -3318,31 +3328,45 @@
           const dx = currentX - swipeState.startX;
           const dy = currentY - swipeState.startY;
 
-          if (!swipeState.isSwiping) {
-            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) {
-              swipeState.isSwiping = true;
-            } else {
-              return;
-            }
+          // Determine gesture intent on iPad and mobile touchmove
+          if (swipeState.isHorizontal === null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+            swipeState.isHorizontal = Math.abs(dx) > Math.abs(dy);
           }
 
-          if (dx < 0) { // Swiping Left
-            let offset = dx;
-            if (offset < -80) {
-              // Apply rubber-banding dampening factor 0.35 past 80px
-              offset = -80 + (offset + 80) * 0.35;
+          // If vertical scroll: release event to container
+          if (swipeState.isHorizontal === false) return;
+
+          // If horizontal swipe: lock scroll container (crucial for iPad)
+          if (swipeState.isHorizontal === true) {
+            e.preventDefault();
+            swipeState.isSwiping = true;
+
+            if (dx < 0) { // Swiping Left
+              let offset = dx;
+              if (offset < -80) {
+                // Apply rubber-banding dampening factor 0.35 past 80px
+                offset = -80 + (offset + 80) * 0.35;
+              }
+              card.style.transform = `translateX(${offset}px)`;
+              swipeState.currentX = offset;
+            } else if (dx > 0 && swipeState.revealedCard === card) {
+              // Swiping back right from revealed state
+              const offset = -80 + dx;
+              card.style.transform = `translateX(${Math.min(0, offset)}px)`;
+              swipeState.currentX = offset;
             }
-            card.style.transform = `translateX(${offset}px)`;
-          } else if (dx > 0 && swipeState.revealedCard === card) {
-            // Swiping back right from revealed state
-            const offset = -80 + dx;
-            card.style.transform = `translateX(${Math.min(0, offset)}px)`;
           }
-        }, { passive: true });
+        }, { passive: false });
 
         card.addEventListener('touchend', e => {
           if (!swipeState.card || swipeState.card !== card) return;
           card.classList.remove('swiping');
+
+          if (swipeState.isHorizontal !== true) {
+            swipeState.card = null;
+            return;
+          }
+
           const endX = e.changedTouches[0].clientX;
           const dx = endX - swipeState.startX;
 
@@ -3360,6 +3384,7 @@
             if (swipeState.revealedCard === card) swipeState.revealedCard = null;
           }
           swipeState.card = null;
+          swipeState.isHorizontal = null;
         }, { passive: true });
       });
     }
