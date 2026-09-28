@@ -2903,15 +2903,18 @@
       <div class="player-stage-container">
         <!-- 16:9 Video Box -->
         <div class="player-video-box" id="playerVideoBox">
-          <div class="mock-video-overlay" id="mockVideoOverlay" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800');">
+          <div class="mock-video-overlay" id="mockVideoOverlay" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800'); display: none;">
             <div class="mock-video-tag" id="playerTagBadge" style="color: var(--accent-teal);">● VieNeu: Anh Khôi</div>
           </div>
-          <iframe id="realYoutubeFrame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="display: none; width: 100%; height: 100%; border: none;"></iframe>
+          <iframe id="ytPlayer" src="https://www.youtube.com/embed/M576WGiDBdQ?autoplay=0&controls=0&rel=0&modestbranding=1&enablejsapi=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>
           <!-- Floating CC Pill (When Subtitles are Off, tap to restore) -->
           <div class="floating-cc-pill" id="floatingCcPill" onclick="setSubtitleMode('bilingual')" style="display: none;">
             <span id="floatingCcText">CC Tắt</span>
           </div>
         </div>
+
+        <!-- Hidden audio element for dubbed voice -->
+        <audio id="dubAudio" style="display:none;" preload="auto"></audio>
 
         <!-- ─── FEATURE 2: SUBTITLE HUD WITH 3-WAY SELECTOR ─── -->
         <div class="subtitle-hud" id="subtitleHud">
@@ -2930,52 +2933,87 @@
           <div class="audio-dock">
             <div class="audio-slider-row">
               <div class="slider-label">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                </svg>
                 <span>Gốc</span>
               </div>
-              <div class="slider-track">
-                <div class="slider-fill goc"></div>
+              <div class="slider-track" style="position:relative;">
+                <div class="slider-fill goc" id="fillGoc" style="width:20%"></div>
+                <input type="range" id="sliderGoc" min="0" max="100" value="20"
+                  style="position:absolute;top:50%;left:0;width:100%;height:24px;
+                         transform:translateY(-50%);opacity:0;cursor:pointer;
+                         margin:0;padding:0;-webkit-appearance:none;"
+                  oninput="handleVolumeChange('goc', this.value)">
               </div>
-              <div class="slider-val">20%</div>
+              <div class="slider-val" id="valGoc">20%</div>
             </div>
 
             <div class="audio-slider-row">
-              <div class="slider-label" style="color: var(--text-primary)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary)"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+              <div class="slider-label" style="color:var(--text-primary)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" style="color:var(--accent-primary)">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
                 <span>Lồng tiếng</span>
               </div>
-              <div class="slider-track">
-                <div class="slider-fill dub"></div>
+              <div class="slider-track" style="position:relative;">
+                <div class="slider-fill dub" id="fillDub" style="width:90%"></div>
+                <input type="range" id="sliderDub" min="0" max="100" value="90"
+                  style="position:absolute;top:50%;left:0;width:100%;height:24px;
+                         transform:translateY(-50%);opacity:0;cursor:pointer;
+                         margin:0;padding:0;-webkit-appearance:none;"
+                  oninput="handleVolumeChange('dub', this.value)">
               </div>
-              <div class="slider-val" style="color: var(--text-primary)">90%</div>
+              <div class="slider-val" id="valDub" style="color:var(--text-primary)">90%</div>
             </div>
           </div>
 
           <!-- Playback Transport Controls -->
           <div class="transport-dock">
             <div class="seekbar-row">
-              <span class="time-stamp">01:42</span>
-              <div class="seekbar-track">
-                <div class="seekbar-buffered"></div>
-                <div class="seekbar-played"></div>
-                <div class="seekbar-thumb"></div>
+              <span class="time-stamp" id="timeElapsed">00:00</span>
+              <div class="seekbar-track" style="position:relative;flex:1;">
+                <div class="seekbar-buffered" id="seekBuffered" style="width:60%"></div>
+                <div class="seekbar-played" id="seekPlayed" style="width:0%"></div>
+                <div class="seekbar-thumb" id="seekThumb" style="left:0%"></div>
+                <input type="range" id="seekbarInput" min="0" max="100" value="0"
+                  style="position:absolute;top:50%;left:0;width:100%;height:32px;
+                         transform:translateY(-50%);opacity:0;cursor:pointer;
+                         margin:0;padding:0;-webkit-appearance:none;"
+                  oninput="handleSeek(this.value)">
               </div>
-              <span class="time-stamp">-03:30</span>
+              <span class="time-stamp" id="timeRemaining">-05:12</span>
             </div>
 
             <div class="buttons-row">
-              <button class="btn-skip">
+              <button class="btn-skip" onclick="skipSeconds(-10)">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
                 <span>-10s</span>
               </button>
 
-              <button class="btn-play-pause" onclick="togglePlayPause()" id="mainPlayPauseBtn">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+              <button class="btn-play-pause" id="btnPlayPause" onclick="togglePlayPause()">
+                <svg id="iconPause" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16"></rect>
+                  <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+                <svg id="iconPlay" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
               </button>
 
-              <button class="btn-skip">
+              <button class="btn-skip" onclick="skipSeconds(10)">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
                 <span>+10s</span>
+              </button>
+
+              <button class="btn-skip" id="btnSpeed" onclick="cycleSpeed()">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+                <span id="speedLabel">1×</span>
               </button>
             </div>
           </div>
@@ -3179,6 +3217,10 @@
       model: 'vieneu', // 'vieneu' | 'free' | 'azure'
       activeVoice: 'Anh Khôi',
       subtitleMode: 'bilingual', // 'bilingual' | 'vi_only' | 'off'
+      currentVideoId: null,
+      isPlaying: false,
+      currentSegment: 0,
+      subtitles: [],
       cache: {
         files: 143,
         sizeMB: 42.5,
@@ -3796,22 +3838,29 @@
       }
     }
 
-    // YouTube ID Extractor
-    function extractYouTubeId(url) {
+    // Helper to extract YouTube videoId
+    function extractVideoId(url) {
       if (!url) return null;
-      url = url.trim();
-      if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
-      const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
-      return match ? match[1] : null;
+      const patterns = [
+        /youtube\.com\/watch\?v=([^&]+)/,
+        /youtu\.be\/([^?]+)/,
+        /youtube\.com\/shorts\/([^?]+)/,
+        /youtube\.com\/embed\/([^?]+)/
+      ];
+      for (const p of patterns) {
+        const m = url.match(p);
+        if (m) return m[1];
+      }
+      if (/^[a-zA-Z0-9_-]{11}$/.test(url.trim())) return url.trim();
+      return null;
     }
 
     // Launch Logic from Home
     function handleLaunchFromHome() {
-      const input = document.getElementById('youtubeInput');
-      const rawUrl = input ? input.value.trim() : '';
-      const videoId = extractYouTubeId(rawUrl) || 'M576WGiDBdQ';
+      const url = document.getElementById('youtubeInput').value.trim();
+      const videoId = extractVideoId(url);
+      if (!videoId) { alert('Link YouTube không hợp lệ'); return; }
       state.currentVideoId = videoId;
-      state.currentVideoUrl = rawUrl;
 
       if (state.model === 'vieneu') {
         switchScreen('screen-warmup');
@@ -3824,6 +3873,7 @@
       state.currentVideoId = cardVideoId || (type === 'cloud' ? '7rPj7e8b6r4' : 'M576WGiDBdQ');
       if (type === 'cached') {
         switchScreen('screen-player');
+        launchPlayer();
       } else if (type === 'cloud') {
         selectModel('free');
         triggerQuickWarmup('free');
@@ -3847,8 +3897,213 @@
       handleLaunchFromHome();
     }
 
+    // Volume Sliders Handler
+    function handleVolumeChange(track, value) {
+      const val = parseInt(value);
+      if (track === 'goc') {
+        const fillGoc = document.getElementById('fillGoc');
+        const valGoc = document.getElementById('valGoc');
+        if (fillGoc) fillGoc.style.width = val + '%';
+        if (valGoc) valGoc.textContent = val + '%';
+        try {
+          const iframe = document.getElementById('ytPlayer');
+          if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage(
+              JSON.stringify({ event: 'command', func: 'setVolume', args: [val] }), '*'
+            );
+          }
+        } catch (e) {}
+      } else {
+        const fillDub = document.getElementById('fillDub');
+        const valDub = document.getElementById('valDub');
+        if (fillDub) fillDub.style.width = val + '%';
+        if (valDub) valDub.textContent = val + '%';
+        const dubAudio = document.getElementById('dubAudio');
+        if (dubAudio) dubAudio.volume = val / 100;
+      }
+    }
+
+    // ─── PLAYER STATE ───
+    const player = {
+      isPlaying: false,
+      currentTime: 0,
+      duration: 312,
+      speed: 1,
+      speeds: [0.75, 1, 1.25, 1.5, 2],
+      speedIndex: 1,
+      seekInterval: null
+    };
+
+    function togglePlayPause() {
+      player.isPlaying = !player.isPlaying;
+      const pauseIcon = document.getElementById('iconPause');
+      const playIcon  = document.getElementById('iconPlay');
+      if (player.isPlaying) {
+        if (pauseIcon) pauseIcon.style.display = '';
+        if (playIcon)  playIcon.style.display  = 'none';
+        startSeekbarTick();
+        const dub = document.getElementById('dubAudio');
+        if (dub && dub.src) dub.play().catch(() => {});
+        try {
+          document.getElementById('ytPlayer')?.contentWindow?.postMessage(
+            '{"event":"command","func":"playVideo","args":""}', '*'
+          );
+        } catch (e) {}
+        if ('speechSynthesis' in window) window.speechSynthesis.resume();
+      } else {
+        if (pauseIcon) pauseIcon.style.display = 'none';
+        if (playIcon)  playIcon.style.display  = '';
+        stopSeekbarTick();
+        const dub = document.getElementById('dubAudio');
+        if (dub) dub.pause();
+        try {
+          document.getElementById('ytPlayer')?.contentWindow?.postMessage(
+            '{"event":"command","func":"pauseVideo","args":""}', '*'
+          );
+        } catch (e) {}
+        if ('speechSynthesis' in window) window.speechSynthesis.pause();
+      }
+    }
+
+    function skipSeconds(delta) {
+      player.currentTime = Math.max(0, Math.min(player.duration, player.currentTime + delta));
+      updateSeekbarUI();
+      try {
+        document.getElementById('ytPlayer')?.contentWindow?.postMessage(
+          JSON.stringify({
+            event: 'command',
+            func: 'seekTo',
+            args: [player.currentTime, true]
+          }), '*'
+        );
+      } catch (e) {}
+      const dub = document.getElementById('dubAudio');
+      if (dub && dub.src) { dub.currentTime = player.currentTime; }
+    }
+
+    function handleSeek(value) {
+      const pct = parseInt(value);
+      player.currentTime = (pct / 100) * player.duration;
+      updateSeekbarUI();
+      try {
+        document.getElementById('ytPlayer')?.contentWindow?.postMessage(
+          JSON.stringify({ event: 'command', func: 'seekTo', args: [player.currentTime, true] }), '*'
+        );
+      } catch (e) {}
+      const dub = document.getElementById('dubAudio');
+      if (dub && dub.src) { dub.currentTime = player.currentTime; }
+    }
+
+    function cycleSpeed() {
+      player.speedIndex = (player.speedIndex + 1) % player.speeds.length;
+      player.speed = player.speeds[player.speedIndex];
+      const label = document.getElementById('speedLabel');
+      if (label) label.textContent = player.speed + '×';
+      const dub = document.getElementById('dubAudio');
+      if (dub) dub.playbackRate = player.speed;
+    }
+
+    function startSeekbarTick() {
+      stopSeekbarTick();
+      if (!player.duration) player.duration = 312;
+      player.seekInterval = setInterval(() => {
+        if (!player.isPlaying) return;
+        player.currentTime = Math.min(player.duration, player.currentTime + player.speed);
+        updateSeekbarUI();
+        if (player.currentTime >= player.duration) {
+          player.isPlaying = false;
+          stopSeekbarTick();
+        }
+      }, 1000);
+    }
+
+    function stopSeekbarTick() {
+      if (player.seekInterval) {
+        clearInterval(player.seekInterval);
+        player.seekInterval = null;
+      }
+    }
+
+    function updateSeekbarUI() {
+      if (!player.duration) return;
+      const pct = (player.currentTime / player.duration) * 100;
+
+      const played   = document.getElementById('seekPlayed');
+      const thumb    = document.getElementById('seekThumb');
+      const input    = document.getElementById('seekbarInput');
+      const elapsed  = document.getElementById('timeElapsed');
+      const remain   = document.getElementById('timeRemaining');
+
+      if (played) played.style.width = pct + '%';
+      if (thumb)  thumb.style.left   = pct + '%';
+      if (input)  input.value        = pct;
+      if (elapsed) elapsed.textContent  = formatTime(player.currentTime);
+      if (remain)  remain.textContent   = '-' + formatTime(player.duration - player.currentTime);
+    }
+
+    function formatTime(seconds) {
+      const s = Math.floor(seconds);
+      const m = Math.floor(s / 60);
+      const rem = s % 60;
+      return m + ':' + String(rem).padStart(2, '0');
+    }
+
+    function resetPlayerState() {
+      player.isPlaying = false;
+      player.currentTime = 0;
+      player.duration = 312; // placeholder until real backend supplies duration
+      player.speedIndex = 1;
+      player.speed = 1;
+      stopSeekbarTick();
+      updateSeekbarUI();
+      const pauseIcon = document.getElementById('iconPause');
+      const playIcon  = document.getElementById('iconPlay');
+      if (pauseIcon) pauseIcon.style.display = '';
+      if (playIcon)  playIcon.style.display  = 'none';
+      player.isPlaying = true;
+      startSeekbarTick();
+    }
+
+    function launchPlayer() {
+      const videoId = state.currentVideoId || 'M576WGiDBdQ';
+      state.currentVideoId = videoId;
+
+      // Load YouTube iframe
+      const iframe = document.getElementById('ytPlayer');
+      if (iframe) {
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&rel=0&modestbranding=1&enablejsapi=1`;
+      }
+
+      // Hide overlay
+      const overlay = document.getElementById('mockVideoOverlay');
+      if (overlay) overlay.style.display = 'none';
+
+      // Set iframe volume low (YouTube iframe API — injected via postMessage)
+      setTimeout(() => {
+        try {
+          iframe?.contentWindow?.postMessage(
+            '{"event":"command","func":"setVolume","args":[20]}', '*'
+          );
+        } catch (e) {}
+      }, 2000);
+
+      updatePlayerModelBadge();
+      resetPlayerState();
+
+      // Fetch video title for badge
+      const tagBadge = document.getElementById('playerTagBadge');
+      fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.title && tagBadge) {
+            tagBadge.textContent = `● ${d.title}`;
+          }
+        }).catch(() => {});
+
+      startSubtitleAndSpeechSync();
+    }
+
     // Dynamic Subtitles and Speech Synthesis Sync
-    let speechUtterance = null;
     let playbackInterval = null;
     let currentSubIndex = 0;
 
@@ -3875,32 +4130,6 @@
       } catch (e) {}
     }
 
-    function initPlayerView() {
-      const videoId = state.currentVideoId || 'M576WGiDBdQ';
-      const overlay = document.getElementById('mockVideoOverlay');
-      const iframe = document.getElementById('realYoutubeFrame');
-      const tagBadge = document.getElementById('playerTagBadge');
-
-      if (iframe) {
-        iframe.style.display = 'block';
-        iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&enablejsapi=1&playsinline=1&rel=0`;
-      }
-      if (overlay) {
-        overlay.style.display = 'none';
-      }
-
-      // Try fetching video title
-      fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`)
-        .then(r => r.json())
-        .then(d => {
-          if (d && d.title && tagBadge) {
-            tagBadge.textContent = `● ${d.title}`;
-          }
-        }).catch(() => {});
-
-      startSubtitleAndSpeechSync();
-    }
-
     function startSubtitleAndSpeechSync() {
       if (playbackInterval) clearInterval(playbackInterval);
       currentSubIndex = 0;
@@ -3920,7 +4149,7 @@
       updateSubtitle(0);
       let currentSec = 0;
       playbackInterval = setInterval(() => {
-        if (!isPlaying) return;
+        if (!player.isPlaying) return;
         currentSec++;
         const nextIndex = demoSubtitles.findIndex((s, i) => {
           const next = demoSubtitles[i + 1];
@@ -3931,27 +4160,6 @@
           updateSubtitle(currentSubIndex);
         }
       }, 1000);
-    }
-
-    let isPlaying = true;
-    function togglePlayPause() {
-      const iframe = document.getElementById('realYoutubeFrame');
-      const btn = document.getElementById('mainPlayPauseBtn');
-      isPlaying = !isPlaying;
-      if (iframe && iframe.contentWindow) {
-        const cmd = isPlaying ? 'playVideo' : 'pauseVideo';
-        iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: cmd }), '*');
-      }
-      if (btn) {
-        btn.innerHTML = isPlaying 
-          ? '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>'
-          : '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
-      }
-      if (!isPlaying) {
-        if ('speechSynthesis' in window) window.speechSynthesis.pause();
-      } else {
-        if ('speechSynthesis' in window) window.speechSynthesis.resume();
-      }
     }
 
     // Screen Switching Engine
@@ -3991,7 +4199,7 @@
       } else if (screenId === 'screen-quick-warmup') {
         triggerQuickWarmup(state.model === 'vieneu' ? 'free' : state.model);
       } else if (screenId === 'screen-player') {
-        initPlayerView();
+        launchPlayer();
       }
     }
 
@@ -4011,6 +4219,7 @@
         if (sec <= 0) {
           clearInterval(countdownTimer);
           switchScreen('screen-player');
+          launchPlayer();
           return;
         }
         if (secEl) secEl.textContent = sec < 10 ? '0' + sec : sec;
@@ -4077,6 +4286,7 @@
           clearInterval(quickTimer);
           setTimeout(() => {
             switchScreen('screen-player');
+            launchPlayer();
           }, 300);
         }
       }, 300);
