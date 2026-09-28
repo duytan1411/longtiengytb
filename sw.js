@@ -1,12 +1,14 @@
 // VieNeu Mobile Player Service Worker
-const CACHE_NAME = 'vieneu-pwa-v1.2.0';
+const CACHE_NAME = 'vieneu-pwa-v1.2.1';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icon.svg',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  './apple-touch-icon.png',
+  './favicon.png'
 ];
 
 self.addEventListener('install', (event) => {
